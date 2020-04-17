@@ -1,0 +1,21 @@
+# NyanSync Syncthing container
+# Basic application for synchronization of files
+
+FROM alpine:3
+
+ARG URL=https://github.com/syncthing/syncthing/releases/download/v1.3.4/syncthing-linux-amd64-v1.3.4.tar.gz
+ARG SHA256=04eca55d8478095fc37929cc71b6197c521a1c6cbf02f3ffe8c03006b6c8bfba
+
+RUN [ "$(wget -q -O- "${URL}" | tee syncthing.tar.gz | sha256sum | cut -d' ' -f1)" = "${SHA256}" ] \
+  && tar xf /syncthing.tar.gz -C /usr/local/bin --strip-components=1 "$(tar tf /syncthing.tar.gz | head -1)syncthing" \
+  && rm -f syncthing.tar.gz
+
+VOLUME /syncthing_cfg /syncthing_dir
+
+ENV SYNCTHING_PARAMS=
+
+WORKDIR /
+
+EXPOSE 8384 22000 21027/udp
+
+CMD syncthing -gui-address 0.0.0.0:8384 -home /syncthing_cfg ${SYNCTHING_PARAMS}

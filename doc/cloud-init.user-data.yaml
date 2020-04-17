@@ -1,0 +1,137 @@
+#cloud-config
+#
+# Replace the next variables to your values:
+# * %%PROJECT_NAME%% - GCP project name
+
+write_files:
+  - path: /etc/systemd/system/nyansync-gcsfuse.service
+    permissions: 0644
+    owner: root
+    content: |
+      [Unit]
+      Description=Start nyansync gcsfuse mount docker container
+      Wants=gcr-online.target
+      After=gcr-online.target
+
+      [Service]
+      Restart=always
+      Environment="HOME=/tmp"
+      ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+      ExecStart=/usr/bin/docker run --rm --name nyansync-gcsfuse -v /tmp/nyansync-gcsfuse_out:/gcsfuse_out:rshared -e "GCSFUSE_BUCKET=%%PROJECT_NAME%%-nyansync-data" --cap-add SYS_ADMIN --device /dev/fuse --security-opt apparmor:unconfined gcr.io/%%PROJECT_NAME%%/nyansync-gcsfuse:latest
+      ExecStop=/usr/bin/docker stop nyansync
+      ExecStopPost=/usr/bin/docker rm nyansync
+
+  - path: /tmp/get_init_bucket_content.sh
+    permissions: 0644
+    owner: root
+    content: |
+      #!/bin/sh
+      # $1 - file/path to get the content
+      token=$(wget -q -O- --header 'Metadata-Flavor: Google' 'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token' | cut -d'"' -f 4)
+      wget -q -O- --header "Authorization: Bearer ${token}" 'https://storage.googleapis.com/storage/v1/b/%%PROJECT_NAME%%-nyansync-init/o/'"$1"'?alt=media'
+
+  - path: /etc/systemd/system/nyansync-encfs.service
+    permissions: 0644
+    owner: root
+    content: |
+      [Unit]
+      Description=Start nyansync encfs encrypt layer docker container
+      Requires=nyansync-gcsfuse.service
+      Wants=gcr-online.target
+      After=nyansync-gcsfuse.service
+
+      [Service]
+      Restart=always
+      Environment="HOME=/tmp"
+      ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+      ExecStartPre=/bin/sh -c '/bin/sh /tmp/get_init_bucket_content.sh fs.conf > /tmp/fs.conf'
+      ExecStartPre=/bin/sh -c 'while true; do [ -z "$(mount | grep nyansync-gcsfuse_out)" ] || break; sleep 0.5; done'
+      ExecStart=/usr/bin/docker run --rm --name nyansync-encfs -v /tmp/nyansync-gcsfuse_out:/encfs_in -v /tmp/nyansync-encfs_out:/encfs_out:rshared -v /tmp/get_init_bucket_content.sh:/get_init_bucket_content.sh -v /tmp/fs.conf:/fs.conf -e 'ENCFS_EXTPASS=sh /get_init_bucket_content.sh fs.data' -e 'ENCFS_PARAMS=-c /fs.conf' --cap-add SYS_ADMIN --device /dev/fuse --security-opt apparmor:unconfined gcr.io/%%PROJECT_NAME%%/nyansync-encfs:latest
+      ExecStop=/usr/bin/docker stop nyansync
+      ExecStopPost=/usr/bin/docker rm nyansync
+
+  - path: /etc/systemd/system/nyansync-syncthing.service
+    permissions: 0644
+    owner: root
+    content: |
+      [Unit]
+      Description=Start nyansync syncthing sync docker container
+      Requires=nyansync-encfs.service
+      Wants=gcr-online.target
+      After=nyansync-encfs.service
+
+      [Service]
+      Restart=always
+      Environment="HOME=/tmp"
+      ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+      ExecStartPre=/bin/sh -c 'while true; do [ -z "$(mount | grep nyansync-encfs_out)" ] || break; sleep 0.5; done'
+      ExecStart=/usr/bin/docker run --rm --name nyansync-syncthing -v /tmp/nyansync-encfs_out/syncthing:/syncthing_cfg -v /tmp/nyansync-encfs_out:/syncthing_dir -p 22000:22000 -p 21027:21027/udp gcr.io/%%PROJECT_NAME%%/nyansync-syncthing:latest
+      ExecStop=/usr/bin/docker stop nyansync-syncthing
+      ExecStopPost=/usr/bin/docker rm nyansync-syncthing
+
+  - path: /tmp/nginx-passwd
+    permissions: 0644
+    owner: root
+    content: |
+      nyansync-admin:$5$25NKwrD$4qPy7M.kPG6yNHnBH/z4SXMEB6EpwGQ3G.wcj56v1K8
+
+  - path: /tmp/nginx-default.conf
+    permissions: 0644
+    owner: root
+    content: |
+      server {
+        listen       80;
+        server_name  localhost;
+
+        auth_basic "NyanSync Private";
+        auth_basic_user_file /etc/nginx/.passwd;
+
+        location / {
+          root   /usr/share/nginx/html;
+          index  index.html index.htm;
+        }
+
+        location /syncthing/ {
+          proxy_set_header        Host $host;
+          proxy_set_header        X-Real-IP $remote_addr;
+          proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header        X-Forwarded-Proto $scheme;
+
+          proxy_pass              http://nyansync-syncthing:8384/;
+
+          proxy_read_timeout      600s;
+          proxy_send_timeout      600s;
+        }
+
+        location /status/ { # Ping and status
+          auth_basic off;
+          return 200 'OK';
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+          root   /usr/share/nginx/html;
+        }
+      }
+
+  - path: /etc/systemd/system/nyansync-nginx.service
+    permissions: 0644
+    owner: root
+    content: |
+      [Unit]
+      Description=Start nyansync nginx docker container
+      Requires=nyansync-syncthing.service
+      Wants=gcr-online.target
+      After=nyansync-syncthing.service
+
+      [Service]
+      Restart=always
+      Environment="HOME=/tmp"
+      ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+      ExecStart=/usr/bin/docker run --rm --name nyansync-nginx -v /tmp/nginx-passwd:/etc/nginx/.passwd -v /tmp/nginx-default.conf:/etc/nginx/conf.d/default.conf --link nyansync-syncthing -p 80:80 gcr.io/%%PROJECT_NAME%%/nginx:latest
+      ExecStop=/usr/bin/docker stop nyansync-nginx
+      ExecStopPost=/usr/bin/docker rm nyansync-nginx
+
+runcmd:
+  - systemctl daemon-reload
+  - systemctl start nyansync-nginx.service

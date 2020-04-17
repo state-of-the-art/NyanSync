@@ -1,0 +1,17 @@
+# NyanSync EncFS container
+# Useful when you want to encrypt your syncthing
+# shared files, prior to storing them somewhere
+
+FROM alpine:3
+
+RUN apk add --no-cache encfs
+
+VOLUME /encfs_in /encfs_out
+
+WORKDIR /
+
+# Use to provide something like 'wget -q -O- "https://..."'
+ENV ENCFS_EXTPASS="REPLACE" \
+    ENCFS_PARAMS=
+
+CMD encfs --extpass "${ENCFS_EXTPASS}" ${ENCFS_PARAMS} -f /encfs_in /encfs_out

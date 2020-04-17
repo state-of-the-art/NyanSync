@@ -1,0 +1,27 @@
+# NyanSync GCSFuse container
+# Useful when you want to store files on GCS
+
+# Build
+FROM golang:1-alpine as BUILD
+
+RUN apk add --no-cache git
+
+ENV GOPATH /go
+
+RUN go get -u github.com/googlecloudplatform/gcsfuse
+
+# Execute
+FROM alpine:3
+
+RUN apk add --no-cache ca-certificates fuse
+
+COPY --from=BUILD /go/bin/gcsfuse /usr/local/bin
+
+VOLUME /gcsfuse_out
+
+ENV GCSFUSE_PARAMS= \
+    GCSFUSE_BUCKET="REPLACE"
+
+WORKDIR /
+
+CMD gcsfuse ${GCSFUSE_PARAMS} --foreground ${GCSFUSE_BUCKET} /gcsfuse_out
