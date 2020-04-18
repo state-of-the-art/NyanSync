@@ -6,43 +6,52 @@ import (
     "strings"
     "runtime"
     "path/filepath"
-
-    "github.com/pkg/errors"      // errors wrapper
 )
 
-func ExpandTilde(path string) (string, error) {
-    if path == "~" {
-        return os.UserHomeDir()
-    }
+var (
+    AppName = "NyanSync"
+)
 
+func ExpandTilde(path string) (string) {
     path = filepath.FromSlash(path)
     if !strings.HasPrefix(path, fmt.Sprintf("~%c", os.PathSeparator)) {
-        return path, nil
+        return path
     }
 
     home, err := os.UserHomeDir()
     if err != nil {
-        return "", errors.Wrap(err, "user home dir")
+        panic("Unable to get user home dir")
     }
-    return filepath.Join(home, path[2:]), nil
+    return filepath.Join(home, path[2:])
 }
 
-func DefaultConfigDir(app_name string) (dir string, err error) {
+func DefaultConfigDir() (dir string) {
     switch runtime.GOOS {
     case "windows":
         if p := os.Getenv("LocalAppData"); p != "" {
-            return filepath.Join(p, app_name), nil
+            return filepath.Join(p, AppName)
         }
-        dir = filepath.Join(os.Getenv("AppData"), app_name)
+        dir = filepath.Join(os.Getenv("AppData"), AppName)
 
     case "darwin":
-        dir, err = ExpandTilde(filepath.Join("~/Library/Application Support", app_name))
+        dir = ExpandTilde(filepath.Join("~/Library/Application Support", AppName))
 
     default:
-        if xdgCfg := os.Getenv("XDG_CONFIG_HOME"); xdgCfg != "" {
-            return filepath.Join(xdgCfg, app_name), nil
+        if xdg_cfg := os.Getenv("XDG_CONFIG_HOME"); xdg_cfg != "" {
+            return filepath.Join(xdg_cfg, AppName)
         }
-        dir, err = ExpandTilde(filepath.Join("~/.config", app_name))
+        dir = ExpandTilde(filepath.Join("~/.config", AppName))
     }
     return
+}
+
+func RealFilePath(file_path string) (path string) {
+    path = ExpandTilde(file_path)
+    if filepath.IsAbs(path) {
+        return
+    }
+
+    default_dir := DefaultConfigDir()
+
+    return filepath.Join(default_dir, path)
 }

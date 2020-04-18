@@ -15,6 +15,7 @@ import (
     "github.com/gorilla/mux"     // http api
 
     "nyansync/config"
+    "nyansync/core"
 )
 
 type Catalog struct {
@@ -163,11 +164,14 @@ func main() {
     cfg := config.Load()
     fmt.Printf("%+v\n", cfg)
 
+    core.Init(cfg)
+
     router := mux.NewRouter().StrictSlash(true)
     router.HandleFunc("/", homeLink)
     router.HandleFunc("/ping", pingLink)
 
     initApiV1(router)
 
-    log.Fatal(http.ListenAndServe(":8080", router))
+    fmt.Printf("Run HTTP server on: %s\n", cfg.Endpoint.Address)
+    log.Fatal(http.ListenAndServe(cfg.Endpoint.Address, router))
 }

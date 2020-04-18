@@ -16,8 +16,9 @@ type Config struct {
         Url string `cfgRequired:"true"` // Address of a receiver or name and params
         Options []OptionItem // Options depends on the receiver type // TODO: subtitles, change audio stream...
     }
-    CatalogFilePath string `cfgDefault:"nyansync_catalog.json"` // If relative - config dir path
+    StateFilePath string `cfgDefault:"nyansync_state.json"` // If relative - config dir path
     AccessFilePath string `cfgDefault:"nyansync_access.json"` // If relative - config dir path
+    CatalogFilePath string `cfgDefault:"nyansync_catalog.json"` // If relative - config dir path
 }
 
 type OptionItem struct {
