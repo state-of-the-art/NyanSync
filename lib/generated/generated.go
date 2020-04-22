@@ -1,6 +1,7 @@
 // Generated package contains automatically generated files
 package generated
 
+// Embed the gui assets
 //go:generate go get github.com/go-bindata/go-bindata/v3/...
 //go:generate go-bindata -fs -prefix "../../" -pkg "generated" -o gui.assets.generated.go ../../gui/...
 

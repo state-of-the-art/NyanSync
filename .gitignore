@@ -1,1 +1,2 @@
-/lib/generated/*.generated.go
+*.generated.*
+/gui/default/vendor

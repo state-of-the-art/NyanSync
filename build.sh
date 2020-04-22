@@ -8,6 +8,8 @@ cp -a "${SRC_DIR}" "${BUILD_DIR}"
 
 cd "${BUILD_DIR}"
 
+scripts/assets.sh
+
 # Generate sources
 go generate ./...
 

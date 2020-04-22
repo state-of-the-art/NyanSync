@@ -2,7 +2,6 @@
 /*global $: false, angular: false, console: false, validLangs: false */
 
 var nyansync = angular.module('nyansync', [
-    'angularUtils.directives.dirPagination',
     'pascalprecht.translate', 'ngSanitize',
 
     'nyansync.core'
