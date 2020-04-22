@@ -14,6 +14,7 @@ TODO
 ## Build
 
 Install `imagemagick` (convert used to generate png files)
+
 Run `./build.sh` from repo or from clean workspace
 
 ## Deploy on GCP
