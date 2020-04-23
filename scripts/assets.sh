@@ -25,6 +25,7 @@ get_tar() {
     url=$1
     sha1=$2
     out_dir=$3
+    shift; shift; shift
     get "${url}" "${sha1}" /tmp/data.tar.gz
     rm -rf "${out_dir}"; mkdir -p "${out_dir}"
     tar xf /tmp/data.tar.gz -C "${out_dir}" --wildcards $@
