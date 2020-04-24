@@ -15,24 +15,39 @@ type User struct {
 	PassHash crypt.Hash // Hash + salt for the user password
 }
 
-func UserGet(login string) *User {
+func UserFind(login string) *User {
 	state.Lock()
+	defer state.Unlock()
 	for _, user := range state.Users {
 		if user.Login == login {
 			return &user
 		}
 	}
+	return nil
+}
+
+func UserGet(login string) *User {
+	if puser := UserFind(login); puser != nil {
+		return puser
+	}
+
+	state.Lock()
+	defer state.Unlock()
 	state.Users = append(state.Users, User{Login: login, Init: true})
 	puser := &state.Users[len(state.Users)-1]
-	state.Unlock()
 	return puser
 }
 
-func UserSet(login string, password string, name string, init bool) {
-	puser := UserGet(login)
-	puser.Lock()
-	puser.Name = name
-	puser.PassHash = crypt.Generate(password, nil)
-	puser.Init = init
-	puser.Unlock()
+func (u *User) Set(password string, name string, init bool) {
+	u.Lock()
+	defer u.Unlock()
+	u.Name = name
+	u.PassHash = crypt.Generate(password, nil)
+	u.Init = init
+}
+
+func (u *User) CheckPassword(password string) bool {
+	u.Lock()
+	defer u.Unlock()
+	return u.PassHash.IsEqual(password)
 }

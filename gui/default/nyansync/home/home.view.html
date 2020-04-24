@@ -1,0 +1,83 @@
+<div class="col-md-10 col-md-offset-1">
+  <div class="row">
+
+    <!-- Sources list (top left) -->
+
+    <div class="col-md-6" aria-labelledby="sources_list" role="region" >
+      <h3 id="sources_list" translate>Sources</h3>
+      <div class="panel-group" id="sources">
+        <div class="panel panel-default" ng-repeat="source in vm.sourcesList()">
+          <!-- Source Head -->
+          <button class="btn panel-heading" data-toggle="collapse" data-parent="#sources" data-target="#source-{{$index}}" aria-expanded="false">
+            <h4 class="panel-title">
+              <div class="panel-icon hidden-xs">
+                <span ng-if="source.type == 'directory'" class="fas fa-fw fa-folder"></span>
+              </div>
+              <div class="panel-title-text">
+                <span tooltip data-original-title="{{source.id}}">{{source.id}}</span>
+              </div>
+            </h4>
+          </button>
+
+          <!-- Source Info -->
+          <div id="source-{{$index}}" class="panel-collapse collapse">
+            <div class="panel-body">
+              <table class="table table-condensed table-striped table-auto">
+                <tbody>
+                  <tr>
+                    <th><span class="fas fa-fw fa-info-circle"></span>&nbsp;<span translate>Source ID</span></th>
+                    <td class="text-right no-overflow-ellipse">{{source.id}}</td>
+                  </tr>
+                  <tr>
+                    <th><span class="fas fa-fw fa-folder-open"></span>&nbsp;<span translate>Source URL</span></th>
+                    <td class="text-right">
+                      <span tooltip data-original-title="{{source.url}}">{{source.url}}</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th><span class="fas fa-fw fa-folder"></span>&nbsp;<span translate>Source Type</span></th>
+                    <td class="text-right">
+                      <span tooltip data-original-title="{{source.type}}" translate>{{source.type}}</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th><span class="fas fa-fw fa-share-alt"></span>&nbsp;<span translate>Shared With</span></th>
+                    <td class="text-right" ng-attr-title="{{sourcesShares(source)}}">{{sourcesShares(source)}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="panel-footer">
+              <span class="pull-right">
+                <button ng-if="!source.paused" type="button" class="btn btn-sm btn-default" ng-click="vm.sourceSetPause(source.id, true)">
+                  <span class="fas fa-pause"></span>&nbsp;<span translate>Pause</span>
+                </button>
+                <button ng-if="source.paused" type="button" class="btn btn-sm btn-default" ng-click="vm.sourceSetPause(source.id, false)">
+                  <span class="fas fa-play"></span>&nbsp;<span translate>Resume</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-default" ng-click="vm.sourceEdit(source)">
+                  <span class="fas fa-pencil-alt"></span>&nbsp;<span translate>Edit</span>
+                </button>
+              </span>
+              <div class="clearfix"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="pull-right">
+        <button type="button" class="btn btn-sm btn-default" ng-click="vm.allSourcesSetPause(true)" ng-if="vm.sourceIsAtleastOnePausedStateSetTo(false)">
+          <span class="fas fa-pause"></span>&nbsp;<span translate>Pause All</span>
+        </button>
+        <button type="button" class="btn btn-sm btn-default" ng-click="vm.allSourcesSetPause(false)" ng-if="vm.sourceIsAtleastOnePausedStateSetTo(true)">
+          <span class="fas fa-play"></span>&nbsp;<span translate>Resume All</span>
+        </button>
+        <button type="button" class="btn btn-sm btn-default" ng-click="sourceAdd()">
+          <span class="fas fa-plus"></span>&nbsp;<span translate>Add Source</span>
+        </button>
+      </span>
+      <div class="clearfix"></div>
+      <hr class="visible-sm"/>
+    </div>
+
+  </div> <!-- /row -->
+</div>

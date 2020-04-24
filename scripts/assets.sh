@@ -39,8 +39,8 @@ get_tar https://github.com/ForkAwesome/Fork-Awesome/archive/1.1.7.tar.gz \
 
 get https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js \
     73b623b7d29122a34e73a061491f708b3b7f9f83 gui/default/vendor/angular/angular.min.js
-get https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular-cookies.min.js \
-    4fc4eb175998a7d387dd6969aaf29ec97c073533 gui/default/vendor/angular/angular-cookies.min.js
+get https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.11/ngStorage.min.js \
+    95eece4152f3eda1aa5f626897f5dd8c790bfa2e gui/default/vendor/angular/ngStorage.min.js
 get https://code.angularjs.org/1.7.9/angular-route.min.js \
     a54d31d32e3135ac6c7e555796bd213ed1ebd303 gui/default/vendor/angular/angular-route.min.js
 

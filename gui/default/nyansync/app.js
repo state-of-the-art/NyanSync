@@ -1,44 +1,53 @@
 (function () {
     'use strict';
 
-    angular
-        .module('app', ['ngRoute', 'ngCookies'])
-        .config(config)
-        .run(run);
+    angular.module('app', [
+        'ngStorage',
+        'ngRoute',
+    ])
+		.constant('urls', {
+            BASE: '/',
+            BASE_API: '/api/v1'
+        })
+        .config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvider) {
+            $routeProvider
+                .when('/', {
+                    controller: 'HomeController',
+                    templateUrl: 'nyansync/home/home.view.html',
+                    controllerAs: 'vm',
+                })
+                .when('/login', {
+                    controller: 'LoginController',
+                    templateUrl: 'nyansync/login/login.view.html',
+                    controllerAs: 'vm',
+                })
+                .otherwise({ redirectTo: '/' });
 
-    config.$inject = ['$routeProvider', '$locationProvider'];
-    function config($routeProvider, $locationProvider) {
-        $routeProvider
-            .when('/', {
-                controller: 'HomeController',
-                templateUrl: 'nyansync/home/home.view.html',
-                controllerAs: 'vm'
-            })
-
-            .when('/login', {
-                controller: 'LoginController',
-                templateUrl: 'nyansync/login/login.view.html',
-                controllerAs: 'vm'
-            })
-
-            .otherwise({ redirectTo: '/login' });
-    }
-
-    run.$inject = ['$rootScope', '$location', '$cookies', '$http'];
-    function run($rootScope, $location, $cookies, $http) {
-        // keep user logged in after page refresh
-        $rootScope.globals = $cookies.getObject('globals') || {};
-        if ($rootScope.globals.currentUser) {
-            $http.defaults.headers.common['Authorization'] = 'Basic ' + $rootScope.globals.currentUser.authdata;
-        }
-
-        $rootScope.$on('$locationChangeStart', function (event, next, current) {
-            // redirect to login page if not logged in and trying to access a restricted page
-            var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
-            var loggedIn = $rootScope.globals.currentUser;
-            if (restrictedPage && !loggedIn) {
-                $location.path('/login');
-            }
+            $httpProvider.interceptors.push(['$q', '$location', '$localStorage', function ($q, $location, $localStorage) {
+                return {
+                    'request': function (config) {
+                        config.headers = config.headers || {};
+                        if ($localStorage.token) {
+                            config.headers.Authorization = 'Bearer ' + $localStorage.token;
+                        }
+                        return config;
+                    },
+                    'responseError': function (response) {
+                        if (response.status === 401 || response.status === 403) {
+                            delete $localStorage.token;
+                            $location.path('/login');
+                        }
+                        return $q.reject(response);
+                    }
+                };
+            }]);
+        }])
+        .run(function($rootScope, $location, $localStorage) {
+            $rootScope.$on( "$routeChangeStart", function(event, next) {
+                if ($localStorage.token == null) {
+                    $location.path("/login");
+                }
+            });
         });
-    }
+
 })();

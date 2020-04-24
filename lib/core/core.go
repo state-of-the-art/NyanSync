@@ -17,6 +17,7 @@ func Init(configuration *config.Config) {
 
 	// Init state
 	state.Init(cfg.StateFilePath)
+	state.SourcesUpdate(cfg.Sources)
 }
 
 func RunHTTPServer() {
@@ -24,8 +25,8 @@ func RunHTTPServer() {
 	router.RedirectTrailingSlash = false
 	router.RedirectFixedPath = false
 
-	gui.Init(cfg.GuiPath, router)
 	api.InitV1(router)
+	gui.Init(cfg.GuiPath, router)
 
 	log.Fatal(router.Run(cfg.Endpoint.Address))
 }

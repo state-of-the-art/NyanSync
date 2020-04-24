@@ -1,31 +1,36 @@
 package state
 
 import (
-	"encoding/json"
-	"io/ioutil"
+	"log"
 	"os"
-	"path/filepath"
 	"sync"
+	"io/ioutil"
+	"encoding/json"
+	"path/filepath"
 
+	"github.com/state-of-the-art/NyanSync/lib/config"
 	"github.com/state-of-the-art/NyanSync/lib/crypt"
 	"github.com/state-of-the-art/NyanSync/lib/location"
 )
 
 const (
-	InitAdminLogin        = "admin"
-	InitAdminPasswordFile = "admin_init_pass.txt"
+	init_admin_login         = "admin"
+	init_admin_password_file = "admin_init_pass.txt"
 )
 
 func Init(config_state_path string) {
 	state.file_path = location.RealFilePath(config_state_path)
 
-	if file, err := os.Open(state.file_path); os.IsExist(err) {
+	log.Println("[DEBUG] Opening stored state", state.file_path)
+	if file, err := os.OpenFile(state.file_path, os.O_RDONLY, 640); err == nil {
 		decoder := json.NewDecoder(file)
-		err = decoder.Decode(state)
+		if err = decoder.Decode(state); err != nil {
+			panic(err)
+		}
 		return
+	} else {
+		log.Println("[INFO] Unable to open state - creating a new one", err)
 	}
-
-	// No access file found, so we need to create one
 
 	parent := filepath.Dir(state.file_path)
 	if err := os.MkdirAll(parent, 0750); err != nil {
@@ -34,13 +39,17 @@ func Init(config_state_path string) {
 
 	// Create admin password, create admin user and store password as admin file
 	admin_pass := crypt.RandString(32)
-	UserSet(InitAdminLogin, admin_pass, "Administrator", true)
+	user := UserGet(init_admin_login)
+	user.Set(admin_pass, "Administrator", true)
 
-	if err := ioutil.WriteFile(filepath.Join(parent, InitAdminPasswordFile), []byte(admin_pass), 0400); err != nil {
+	if err := ioutil.WriteFile(filepath.Join(parent, init_admin_password_file), []byte(admin_pass), 0400); err != nil {
 		panic("Unable to write admin password file")
 	}
 
 	Save()
+}
+
+func SourcesUpdate(cfg_sources []config.Source) {
 }
 
 func Save() {
@@ -60,7 +69,8 @@ type st struct {
 	sync.RWMutex
 	file_path string
 
-	Users []User
+	Users   []User
+	Sources []Source
 }
 
 // Current application state
