@@ -2,6 +2,7 @@ package location
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -20,7 +21,7 @@ func ExpandTilde(path string) string {
 
 	home, err := os.UserHomeDir()
 	if err != nil {
-		panic("Unable to get user home dir")
+		log.Panic("Unable to get user home dir", err)
 	}
 	return filepath.Join(home, path[2:])
 }

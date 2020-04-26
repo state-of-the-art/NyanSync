@@ -1,10 +1,10 @@
 package api
 
 import (
+	jwt "github.com/appleboy/gin-jwt/v2"
+	"github.com/gin-gonic/gin"
 	"log"
 	"time"
-	"github.com/gin-gonic/gin"
-	jwt "github.com/appleboy/gin-jwt/v2"
 
 	"github.com/state-of-the-art/NyanSync/lib/state"
 )
@@ -12,7 +12,7 @@ import (
 func initAuthV1() {
 	identity_key := "id"
 
-	mw, err := jwt.New(&jwt.GinJWTMiddleware {
+	mw, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "nyansync jwt",
 		Key:         []byte("secret key"), // TODO: replace
 		MaxRefresh:  time.Hour,
@@ -62,7 +62,7 @@ func initAuthV1() {
 	})
 
 	if err != nil {
-		panic("JWT Error:" + err.Error())
+		log.Panic("JWT Error:", err)
 	}
 
 	api_data.JWT = mw
@@ -85,9 +85,8 @@ func InitV1(router *gin.Engine) {
 	}
 }
 
-
 type api_s struct {
-	JWT    *jwt.GinJWTMiddleware // jwt object
+	JWT *jwt.GinJWTMiddleware // jwt object
 }
 
 var api_data = &api_s{}

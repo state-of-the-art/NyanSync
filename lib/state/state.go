@@ -1,12 +1,12 @@
 package state
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"os"
-	"sync"
-	"io/ioutil"
-	"encoding/json"
 	"path/filepath"
+	"time"
 
 	"github.com/state-of-the-art/NyanSync/lib/config"
 	"github.com/state-of-the-art/NyanSync/lib/crypt"
@@ -19,22 +19,11 @@ const (
 )
 
 func Init(config_state_path string) {
-	state.file_path = location.RealFilePath(config_state_path)
+	state.FilePathSet(location.RealFilePath(config_state_path))
 
-	log.Println("[DEBUG] Opening stored state", state.file_path)
-	if file, err := os.OpenFile(state.file_path, os.O_RDONLY, 640); err == nil {
-		decoder := json.NewDecoder(file)
-		if err = decoder.Decode(state); err != nil {
-			panic(err)
-		}
+	if state.Load() {
+		// Do not need to init the admin user if state is loaded
 		return
-	} else {
-		log.Println("[INFO] Unable to open state - creating a new one", err)
-	}
-
-	parent := filepath.Dir(state.file_path)
-	if err := os.MkdirAll(parent, 0750); err != nil {
-		panic("Unable to create access file dir")
 	}
 
 	// Create admin password, create admin user and store password as admin file
@@ -42,36 +31,87 @@ func Init(config_state_path string) {
 	user := UserGet(init_admin_login)
 	user.Set(admin_pass, "Administrator", true)
 
-	if err := ioutil.WriteFile(filepath.Join(parent, init_admin_password_file), []byte(admin_pass), 0400); err != nil {
-		panic("Unable to write admin password file")
-	}
+	state.SaveNow()
 
-	Save()
+	admin_password_file := filepath.Join(filepath.Dir(state.FilePathGet()), init_admin_password_file)
+	if err := ioutil.WriteFile(admin_password_file, []byte(admin_pass), 0400); err != nil {
+		log.Panic("Unable to write admin password file", err)
+	}
 }
 
-func SourcesUpdate(cfg_sources []config.Source) {
-}
-
-func Save() {
-	// Save state file
-	data, err := json.Marshal(state)
-	if err != nil {
-		panic("Error during serializing of state struct")
+func SourcesUpdate(cfg_sources map[string]config.Source) {
+	// Update the state sources according the config
+	for id := range cfg_sources {
+		s := SourceGet(id)
+		s.Set(cfg_sources[id].Url, cfg_sources[id].Type)
 	}
 
-	if err := ioutil.WriteFile(state.file_path, data, 0640); err != nil {
-		panic("Error during write the state file")
+	// Removing not existing sources from state
+	if len(cfg_sources) != len(state.Sources) {
+		for id := range state.Sources {
+			if _, ok := cfg_sources[id]; !ok {
+				SourceRemove(id)
+			}
+		}
 	}
+
+	state.Save()
 }
 
 // Struct to store state
 type st struct {
-	sync.RWMutex
-	file_path string
+	config.Base
 
 	Users   []User
-	Sources []Source
+	Sources map[string]Source
 }
 
 // Current application state
 var state = &st{}
+
+func (cfg *st) SaveNow() {
+	log.Println("Saving json", cfg.FilePathGet())
+	if err := os.MkdirAll(filepath.Dir(cfg.FilePathGet()), 0750); err != nil {
+		log.Panic("Unable to create save dir", err)
+	}
+
+	cfg.RLock()
+	defer cfg.RUnlock()
+
+	data, err := json.Marshal(cfg)
+	if err != nil {
+		log.Panic("Error during serializing of the base config struct", err)
+	}
+
+	if err := ioutil.WriteFile(cfg.FilePathGet(), data, 0640); err != nil {
+		log.Panic("Error during write base config to file", err)
+	}
+}
+
+func (cfg *st) Save() {
+	if !cfg.SaveLock() {
+		return
+	}
+
+	go func() {
+		// Wait for 5 seconds and save the config
+		time.Sleep(5 * time.Second)
+		defer cfg.SaveUnlock()
+		cfg.SaveNow()
+	}()
+}
+
+func (cfg *st) Load() bool {
+	log.Println("[DEBUG] Loading from file", cfg.FilePathGet())
+	if file, err := os.OpenFile(cfg.FilePathGet(), os.O_RDONLY, 640); err == nil {
+		defer file.Close()
+		decoder := json.NewDecoder(file)
+		cfg.Lock()
+		defer cfg.Unlock()
+		if err = decoder.Decode(cfg); err != nil {
+			log.Panic("Unable to decode loaded file", err)
+		}
+		return true
+	}
+	return false
+}

@@ -9,35 +9,34 @@ import (
 type Source struct {
 	*config.Source
 	sync.RWMutex
+
+	Id string
 }
 
-func SourceFind(id string) *Source {
-	state.Lock()
-	defer state.Unlock()
-	for _, source := range state.Sources {
-		if source.Id == id {
-			return &source
-		}
-	}
-	return nil
+func SourceExists(id string) bool {
+	_, ok := state.Sources[id]
+	return ok
 }
 
-func SourceGet(id string) *Source {
-	if p := SourceFind(id); p != nil {
-		return p
+func SourceGet(id string) Source {
+	state.RLock()
+	defer state.RUnlock()
+	if _, ok := state.Sources[id]; ok {
+		return state.Sources[id]
 	}
+	return Source{Id: id}
+}
 
+func SourceRemove(id string) {
 	state.Lock()
 	defer state.Unlock()
-	state.Sources = append(state.Sources, Source{})
-	p := &state.Sources[len(state.Sources)-1]
-	p.Id = id
-	return p
+	delete(state.Sources, id)
 }
 
 func (s *Source) Set(url string, _type string /* Options todo */) {
-	s.Lock()
-	defer s.Unlock()
 	s.Url = url
 	s.Type = _type
+	state.Lock()
+	defer state.Unlock()
+	state.Sources[s.Id] = *s
 }

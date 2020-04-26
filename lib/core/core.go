@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/state-of-the-art/NyanSync/lib/api"
-	"github.com/state-of-the-art/NyanSync/lib/gui"
 	"github.com/state-of-the-art/NyanSync/lib/config"
+	"github.com/state-of-the-art/NyanSync/lib/gui"
 	"github.com/state-of-the-art/NyanSync/lib/state"
 )
 
@@ -29,6 +29,10 @@ func RunHTTPServer() {
 	gui.Init(cfg.GuiPath, router)
 
 	log.Fatal(router.Run(cfg.Endpoint.Address))
+}
+
+func ConfigUpdateSource(id string, src *config.Source) {
+	cfg.SourceSet(id, src)
 }
 
 // Core configuration

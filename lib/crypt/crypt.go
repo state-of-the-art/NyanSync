@@ -3,6 +3,7 @@ package crypt
 import (
 	"bytes"
 	"crypto/rand"
+	"log"
 	"math/big"
 
 	"golang.org/x/crypto/argon2" // Choosen password hashing algo
@@ -31,7 +32,7 @@ type Hash struct {
 func RandBytes(size int) (data []byte) {
 	data = make([]byte, size)
 	if _, err := rand.Read(data); err != nil {
-		panic("Err generating random bytes")
+		log.Panic("Err generating random bytes", err)
 	}
 	return
 }
@@ -43,7 +44,7 @@ func RandString(size int) string {
 	for i := range data {
 		charset_pos, err := rand.Int(rand.Reader, charset_len)
 		if err != nil {
-			panic("Err generating random string")
+			log.Panic("Err generating random string", err)
 		}
 		data[i] = rand_string_charset[charset_pos.Int64()]
 	}

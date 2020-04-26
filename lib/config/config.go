@@ -1,32 +1,48 @@
 package config
 
 import (
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/crgimenes/goconfig" // config framework
 	_ "github.com/crgimenes/goconfig/yaml"
+	"gopkg.in/yaml.v2"
 
 	"github.com/state-of-the-art/NyanSync/lib/location"
 )
 
-func Save(cfg *Config) {
+func (cfg *Config) SaveNow() {
+	log.Println("Saving yaml config", cfg.FilePathGet())
 	if err := os.MkdirAll(goconfig.Path, 0755); err != nil {
-		panic("Error create config dir")
+		log.Panic("Error create config dir", err)
 	}
 
+	cfg.RLock()
+	defer cfg.RUnlock()
 	data, err := yaml.Marshal(cfg)
 	if err != nil {
-		panic("Error during yaml marshalling")
+		log.Panic("Error during yaml marshalling", err)
 	}
 
-	path := filepath.Join(goconfig.Path, goconfig.File)
-	if err := ioutil.WriteFile(path, data, 0640); err != nil {
-		panic("Error during write config file")
+	if err := ioutil.WriteFile(cfg.FilePathGet(), data, 0640); err != nil {
+		log.Panic("Error during write config file", err)
 	}
+}
+
+func (cfg *Config) Save() {
+	if !cfg.SaveLock() {
+		return
+	}
+
+	go func() {
+		// Wait for 5 seconds and save the config
+		time.Sleep(5 * time.Second)
+		defer cfg.SaveUnlock()
+		cfg.SaveNow()
+	}()
 }
 
 func Load() *Config {
@@ -35,12 +51,12 @@ func Load() *Config {
 	goconfig.Path = location.DefaultConfigDir()
 	goconfig.File = "nyansync.yaml"
 
+	cfg.FilePathSet(filepath.Join(goconfig.Path, goconfig.File))
 	if err := goconfig.Parse(cfg); err != nil {
-		log.Println("Unable to read config file")
-		panic(err)
+		log.Panic("Unable to read config file", err)
 	}
 
-	Save(cfg)
+	cfg.Save()
 
 	return cfg
 }

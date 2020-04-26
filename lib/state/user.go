@@ -9,15 +9,15 @@ import (
 type User struct {
 	sync.RWMutex
 
-	Name     string     // Real name of the user
 	Login    string     // Login id of the user
+	Name     string     // Real name of the user
 	Init     bool       // First time created user - should be recreated
 	PassHash crypt.Hash // Hash + salt for the user password
 }
 
 func UserFind(login string) *User {
-	state.Lock()
-	defer state.Unlock()
+	state.RLock()
+	defer state.RUnlock()
 	for _, user := range state.Users {
 		if user.Login == login {
 			return &user
@@ -47,7 +47,7 @@ func (u *User) Set(password string, name string, init bool) {
 }
 
 func (u *User) CheckPassword(password string) bool {
-	u.Lock()
-	defer u.Unlock()
+	u.RLock()
+	defer u.RUnlock()
 	return u.PassHash.IsEqual(password)
 }

@@ -2,10 +2,10 @@ package gui
 
 import (
 	"fmt"
+	"net/http"
 	"path"
 	"path/filepath"
 	"strings"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 
@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	theme_default = "default"
-	theme_prefix = "/theme-assets/"
+	theme_default    = "default"
+	theme_prefix     = "/theme-assets/"
 	theme_gui_prefix = "gui/"
 )
 
@@ -53,12 +53,12 @@ func doRoute(c *gin.Context) {
 
 	// Check the preset theme
 	if _, err := fs.Open(theme_gui_prefix + theme + p); err == nil {
-		c.FileFromFS(theme_gui_prefix + theme + p, fs)
+		c.FileFromFS(theme_gui_prefix+theme+p, fs)
 		return
 	}
 
 	// Serve default theme
-	c.FileFromFS(theme_gui_prefix + theme_default + p, fs)
+	c.FileFromFS(theme_gui_prefix+theme_default+p, fs)
 }
 
 var fs http.FileSystem
