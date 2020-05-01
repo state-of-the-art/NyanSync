@@ -24,7 +24,7 @@ func SourceGet(id string) Source {
 	if _, ok := state.Sources[id]; ok {
 		return state.Sources[id]
 	}
-	return Source{Id: id}
+	return Source{&config.Source{}, sync.RWMutex{}, id}
 }
 
 func SourceRemove(id string) {
@@ -33,7 +33,7 @@ func SourceRemove(id string) {
 	delete(state.Sources, id)
 }
 
-func (s *Source) Set(url string, _type string /* Options todo */) {
+func (s *Source) Set(url string, _type string /* TODO: Options */) {
 	s.Url = url
 	s.Type = _type
 	state.Lock()

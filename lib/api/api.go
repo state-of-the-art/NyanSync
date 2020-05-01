@@ -21,7 +21,7 @@ func initAuthV1() {
 			log.Println("[DEBUG]: PayloadFunc")
 			if v, ok := data.(*User); ok {
 				return jwt.MapClaims{
-					identity_key: v.Name,
+					identity_key: v.Login,
 				}
 			}
 			return jwt.MapClaims{}
@@ -29,6 +29,7 @@ func initAuthV1() {
 		IdentityHandler: func(c *gin.Context) interface{} {
 			log.Println("[DEBUG]: IdentityHandler")
 			claims := jwt.ExtractClaims(c)
+			log.Println("[DEBUG]: IdentityHandler", claims)
 			return &User{
 				Login: claims[identity_key].(string),
 			}
@@ -51,7 +52,7 @@ func initAuthV1() {
 			}, nil
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {
-			log.Println("[DEBUG]: Authorizator")
+			log.Println("[DEBUG]: Authorizator", data.(*User))
 			// TODO: check the func
 			if v, ok := data.(*User); ok && v.Login == "admin" {
 				return true
@@ -78,10 +79,11 @@ func InitV1(router *gin.Engine) {
 			auth.POST("/login", api_data.JWT.LoginHandler)
 			auth.GET("/refresh_token", api_data.JWT.RefreshHandler)
 		}
-		/*user := v1.Group("/user")
+		source := v1.Group("/source")
+		source.Use(api_data.JWT.MiddlewareFunc())
 		{
-			// TODO
-		}*/
+			source.GET("/", GetSourcesList)
+		}
 	}
 }
 

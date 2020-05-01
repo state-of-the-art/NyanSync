@@ -34,13 +34,13 @@
 
             return {
                 Login: function (login, password, success, error) {
-                    $http.post(urls.BASE_API + '/auth/login', {
+                    $http.post(urls.BASE_API + 'auth/login', {
                         "login": login,
                         "password": password,
                     }).then(success, error);
                 },
                 Logout: function (success, error) {
-                    $http.post(urls.BASE_API + '/auth/logout').then(success, error)
+                    $http.post(urls.BASE_API + 'auth/logout').then(success, error)
                     tokenClaims = {};
                     delete $localStorage.token;
                     success();

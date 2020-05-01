@@ -4,12 +4,13 @@
     angular.module('app', [
         'ngStorage',
         'ngRoute',
+        'ngResource',
     ])
 		.constant('urls', {
             BASE: '/',
-            BASE_API: '/api/v1'
+            BASE_API: '/api/v1/'
         })
-        .config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvider) {
+        .config(['$routeProvider', '$httpProvider', '$resourceProvider', function($routeProvider, $httpProvider, $resourceProvider) {
             $routeProvider
                 .when('/', {
                     controller: 'HomeController',
@@ -23,7 +24,7 @@
                 })
                 .otherwise({ redirectTo: '/' });
 
-            $httpProvider.interceptors.push(['$q', '$location', '$localStorage', function ($q, $location, $localStorage) {
+            $httpProvider.interceptors.push(['$q', '$location', '$localStorage', 'FlashService', function ($q, $location, $localStorage, FlashService) {
                 return {
                     'request': function (config) {
                         config.headers = config.headers || {};
@@ -32,15 +33,23 @@
                         }
                         return config;
                     },
-                    'responseError': function (response) {
-                        if (response.status === 401 || response.status === 403) {
+                    'response': function (res) {
+                        if (res.data.data)
+                            res.data = res.data.data;
+                        return res;
+                    },
+                    'responseError': function (res) {
+                        FlashService.Error(res.data.message);
+                        if (res.status === 401 || res.status === 403) {
                             delete $localStorage.token;
                             $location.path('/login');
                         }
-                        return $q.reject(response);
-                    }
+                        return $q.reject(res);
+                    },
                 };
             }]);
+
+            $resourceProvider.defaults.stripTrailingSlashes = false;
         }])
         .run(function($rootScope, $location, $localStorage) {
             $rootScope.$on( "$routeChangeStart", function(event, next) {

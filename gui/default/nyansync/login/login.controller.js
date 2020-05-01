@@ -7,14 +7,10 @@
             function ($location, $localStorage, AuthService, FlashService) {
                 var vm = this;
 
-                vm.login = login;
-
                 (function initController() {
-                    // reset login status
-                    //AuthService.ClearCredentials();
                 })();
 
-                function login() {
+                vm.login = function login() {
                     vm.dataLoading = true;
                     AuthService.Login(vm.username, vm.password,
                         function (res) {
@@ -22,7 +18,6 @@
                             vm.dataLoading = false;
                             $location.path('/');
                         }, function (res) {
-                            FlashService.Error(res.data.message);
                             vm.dataLoading = false;
                         }
                     );

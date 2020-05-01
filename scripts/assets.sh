@@ -43,9 +43,14 @@ get https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.11/ngStorage.min.js \
     95eece4152f3eda1aa5f626897f5dd8c790bfa2e gui/default/vendor/angular/ngStorage.min.js
 get https://code.angularjs.org/1.7.9/angular-route.min.js \
     a54d31d32e3135ac6c7e555796bd213ed1ebd303 gui/default/vendor/angular/angular-route.min.js
+get https://cdnjs.cloudflare.com/ajax/libs/angular-resource/1.7.9/angular-resource.min.js \
+    d5f5d8c26163d89eef264ebe19605f77f2d64ada gui/default/vendor/angular/angular-resource.min.js
 
-get https://code.jquery.com/jquery-3.5.0.min.js \
-    1d6ae46f2ffa213dede37a521b011ec1cd8d1ad3 gui/default/vendor/jquery/jquery.min.js
+# 3.4.1 due to issue with pane in bootstrap https://github.com/twbs/bootstrap/issues/30553
+#get https://code.jquery.com/jquery-3.5.0.min.js \
+#    1d6ae46f2ffa213dede37a521b011ec1cd8d1ad3 gui/default/vendor/jquery/jquery.min.js
+get https://code.jquery.com/jquery-3.4.1.min.js \
+    88523924351bac0b5d560fe0c5781e2556e7693d gui/default/vendor/jquery/jquery.min.js
 
 get https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css \
     b0972fdcce82fd583d4c2ccc3f2e3df7404a19d0 gui/default/vendor/bootstrap/css/bootstrap.min.css

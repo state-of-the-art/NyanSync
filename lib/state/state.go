@@ -22,8 +22,15 @@ func Init(config_state_path string) {
 	state.FilePathSet(location.RealFilePath(config_state_path))
 
 	if state.Load() {
+		if state.Sources == nil {
+			state.Sources = make(map[string]Source)
+		}
 		// Do not need to init the admin user if state is loaded
 		return
+	}
+	// TODO: Remove duplication
+	if state.Sources == nil {
+		state.Sources = make(map[string]Source)
 	}
 
 	// Create admin password, create admin user and store password as admin file
@@ -114,4 +121,14 @@ func (cfg *st) Load() bool {
 		return true
 	}
 	return false
+}
+
+func SourcesList() []Source {
+	// TODO: actual sources
+	out := make([]Source, 0, len(state.Sources))
+
+	for _, value := range state.Sources {
+		out = append(out, value)
+	}
+	return out
 }
