@@ -45,6 +45,11 @@ get https://code.angularjs.org/1.7.9/angular-route.min.js \
     a54d31d32e3135ac6c7e555796bd213ed1ebd303 gui/default/vendor/angular/angular-route.min.js
 get https://cdnjs.cloudflare.com/ajax/libs/angular-resource/1.7.9/angular-resource.min.js \
     d5f5d8c26163d89eef264ebe19605f77f2d64ada gui/default/vendor/angular/angular-resource.min.js
+get https://cdnjs.cloudflare.com/ajax/libs/angular-animate/1.7.9/angular-animate.min.js \
+    33cc606e04b0a36f086ef35a17c1a90c48d2ccc6 gui/default/vendor/angular/angular-animate.min.js
+
+get https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap-tpls.min.js \
+    f692082f69c296cc7635b01e1fef8173c27dac54 gui/default/vendor/ui-bootstrap/ui-bootstrap-tpls.min.js
 
 # 3.4.1 due to issue with pane in bootstrap https://github.com/twbs/bootstrap/issues/30553
 #get https://code.jquery.com/jquery-3.5.0.min.js \

@@ -1,10 +1,11 @@
 package api
 
 import (
-	jwt "github.com/appleboy/gin-jwt/v2"
-	"github.com/gin-gonic/gin"
 	"log"
 	"time"
+
+	jwt "github.com/appleboy/gin-jwt/v2"
+	"github.com/gin-gonic/gin"
 
 	"github.com/state-of-the-art/NyanSync/lib/state"
 )
@@ -82,7 +83,8 @@ func InitV1(router *gin.Engine) {
 		source := v1.Group("/source")
 		source.Use(api_data.JWT.MiddlewareFunc())
 		{
-			source.GET("/", GetSourcesList)
+			source.GET("/", SourcesGetList)
+			source.POST("/:id", SourcePost)
 		}
 	}
 }

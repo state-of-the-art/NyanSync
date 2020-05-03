@@ -1,7 +1,6 @@
 package gui
 
 import (
-	"fmt"
 	"net/http"
 	"path"
 	"path/filepath"
@@ -31,15 +30,17 @@ func Init(p string, router *gin.Engine) {
 }
 
 func doRoute(c *gin.Context) {
-	fmt.Printf("[DEBUG] Processing static: %s\n", c.Request.URL.Path)
-
 	p := c.Request.URL.Path
+	if c.Request.Method != "GET" || strings.HasPrefix(p, "/api") {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"message": "Unable to handle request"})
+		return
+	}
+
 	file := path.Base(p)
 
 	// Serve our index file
 	if file == "" || filepath.Ext(file) == "" {
 		c.FileFromFS("gui/default/index.htm", fs)
-		fmt.Printf("[DEBUG] Processing static 2: %s, %s\n", file, c.Writer.Status())
 		return
 	}
 

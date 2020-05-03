@@ -11,14 +11,14 @@
                 })();
 
                 vm.login = function login() {
-                    vm.dataLoading = true;
+                    vm.data_loading = true;
                     AuthService.Login(vm.username, vm.password,
                         function (res) {
                             $localStorage.token = res.data.token;
-                            vm.dataLoading = false;
+                            vm.data_loading = false;
                             $location.path('/');
                         }, function (res) {
-                            vm.dataLoading = false;
+                            vm.data_loading = false;
                         }
                     );
                 };
