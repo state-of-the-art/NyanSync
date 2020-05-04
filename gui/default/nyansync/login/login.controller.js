@@ -3,8 +3,8 @@
 
     angular
         .module('app')
-        .controller('LoginController', ['$location', '$localStorage', 'AuthService', 'FlashService',
-            function ($location, $localStorage, AuthService, FlashService) {
+        .controller('LoginController', ['$location', '$localStorage', 'AuthService',
+            function ($location, $localStorage, AuthService) {
                 var vm = this;
 
                 (function initController() {

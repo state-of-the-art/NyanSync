@@ -48,6 +48,11 @@ get https://cdnjs.cloudflare.com/ajax/libs/angular-resource/1.7.9/angular-resour
 get https://cdnjs.cloudflare.com/ajax/libs/angular-animate/1.7.9/angular-animate.min.js \
     33cc606e04b0a36f086ef35a17c1a90c48d2ccc6 gui/default/vendor/angular/angular-animate.min.js
 
+get https://cdnjs.cloudflare.com/ajax/libs/angular-ui-notification/0.3.6/angular-ui-notification.min.js \
+    69014985ba0ce6272f1c022ab6ff3742815d6dd6 gui/default/vendor/angular-ui-notification/angular-ui-notification.min.js
+get https://cdnjs.cloudflare.com/ajax/libs/angular-ui-notification/0.3.6/angular-ui-notification.min.css \
+    298c93311d5a5bb6dde7c5ad52db108d95404d9f gui/default/vendor/angular-ui-notification/angular-ui-notification.min.css
+
 get https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap-tpls.min.js \
     f692082f69c296cc7635b01e1fef8173c27dac54 gui/default/vendor/ui-bootstrap/ui-bootstrap-tpls.min.js
 

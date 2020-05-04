@@ -85,6 +85,7 @@ func InitV1(router *gin.Engine) {
 		{
 			source.GET("/", SourcesGetList)
 			source.POST("/:id", SourcePost)
+			source.DELETE("/:id", SourceDelete)
 		}
 	}
 }

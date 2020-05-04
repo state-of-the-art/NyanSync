@@ -29,10 +29,20 @@ func SourcePost(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Wrong request body: %v", err)})
 		return
 	}
-	if err := data.Save(); err != nil {
+	if err := data.SaveRename(c.Param("id")); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Unable to save source: %v", err)})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Source stored"})
+}
+
+func SourceDelete(c *gin.Context) {
+	id := c.Param("id")
+	if !state.SourceExists(id) {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Source not found"})
+		return
+	}
+	state.SourceRemove(id)
+	c.JSON(http.StatusOK, gin.H{"message": "Source removed"})
 }

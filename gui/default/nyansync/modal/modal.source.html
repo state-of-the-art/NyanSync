@@ -1,21 +1,21 @@
 <div class="modal-header">
-  <h3 class="modal-title" id="modal-title">Add new source</h3>
+  <h3 class="modal-title" id="modal-title">{{ vm.title }}</h3>
 </div>
 <form name="form" role="form" ng-submit="vm.submit()">
   <div class="modal-body" id="modal-body">
-    <div class="form-group"  ng-class="{ 'has-error': form.source_id.$dirty && form.source_id.$invalid }">
+    <div class="form-group" ng-class="{ 'has-error': form.source_id.$dirty && form.source_id.$invalid }">
       <label for="source_id">Name</label>
       <input type="text" ng-model="source.Id" name="source_id" class="form-control" placeholder="Unique name for a new source" required my-source-id />
       <span ng-show="form.source_id.$dirty && form.source_id.$error.required" class="help-block">Name is required</span>
       <span ng-show="form.source_id.$dirty && form.source_id.$error.sourceid" class="help-block">Specified name is not unique</span>
     </div>
-    <div class="form-group"  ng-class="{ 'has-error': form.source_url.$dirty && form.source_url.$invalid }">
+    <div class="form-group" ng-class="{ 'has-error': form.source_url.$dirty && form.source_url.$invalid }">
       <label for="source_url">URL</label>
       <input type="url" ng-model="source.Url" name="source_url" class="form-control" placeholder="Source URL like 'file:///data/' or 'http://site.org/data/'" required />
       <span ng-show="form.source_url.$dirty && form.source_url.$error.required" class="help-block">URL is required</span>
       <span ng-show="form.source_url.$dirty && form.source_url.$error.url" class="help-block">Invalid URL format</span>
     </div>
-    <div class="form-group"  ng-class="{ 'has-error': form.source_type.$dirty && form.source_type.$invalid }">
+    <div class="form-group" ng-class="{ 'has-error': form.source_type.$dirty && form.source_type.$invalid }">
       <!-- TODO: list of available types -->
       <label for="source_type">Type</label>
       <input type="text" ng-model="source.Type" name="source_type" class="form-control" placeholder="Source type, like 'directory'" required />
@@ -24,7 +24,18 @@
   </div>
   <div class="modal-footer">
     <i ng-if="vm.data_loading" class="fa fa-spinner loading-progress" aria-hidden="true"></i>
-    <button class="btn btn-primary" type="submit" ng-disabled="form.$invalid || vm.data_loading">Save</button>
-    <button class="btn btn-warning" type="button" ng-click="vm.cancel()">Cancel</button>
+    <span class="tooltip-wrapper" title="{{ !form.$dirty || form.$invalid ? 'Form not changed or invalid' : '' }}">
+      <button class="btn btn-primary" type="submit" ng-disabled="!form.$dirty || form.$invalid || vm.data_loading">
+        <span class="fas fa-check"></span>&nbsp;<span translate>Save</span>
+      </button>
+    </span>
+    <button class="btn btn-default" type="button" ng-click="vm.cancel()">
+      <span class="fas fa-times"></span>&nbsp;<span translate>Cancel</span>
+    </button>
+    <span class="tooltip-wrapper pull-left" title="{{ form.$dirty ? 'Remove not available for changed item' : '' }}">
+      <button type="button" class="btn btn-warning" ng-click="vm.remove()" ng-if="source._orig_id" ng-disabled="form.$dirty">
+        <span class="fas fa-minus-circle"></span>&nbsp;<span translate>Remove</span>
+      </button>
+    </span>
   </div>
 </form>

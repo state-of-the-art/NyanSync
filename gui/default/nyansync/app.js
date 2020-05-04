@@ -6,13 +6,24 @@
         'ngRoute',
         'ngResource',
         'ui.bootstrap',
+        'ui-notification',
     ])
-		.constant('urls', {
+        .constant('urls', {
             BASE: '/',
             BASE_API: '/api/v1/'
         })
-        .config(['$routeProvider', '$httpProvider', '$resourceProvider', '$qProvider',
-            function($routeProvider, $httpProvider, $resourceProvider, $qProvider) {
+        .config(['$routeProvider', '$httpProvider', '$resourceProvider', '$qProvider', 'NotificationProvider',
+            function($routeProvider, $httpProvider, $resourceProvider, $qProvider, NotificationProvider) {
+            NotificationProvider.setOptions({
+                delay: 10000,
+                startTop: 20,
+                startRight: 10,
+                verticalSpacing: 20,
+                horizontalSpacing: 20,
+                positionX: 'right',
+                positionY: 'top'
+            });
+
             $routeProvider
                 .when('/', {
                     controller: 'HomeController',
@@ -26,8 +37,8 @@
                 })
                 .otherwise({ redirectTo: '/' });
 
-            $httpProvider.interceptors.push(['$q', '$location', '$localStorage', 'FlashService', '$cacheFactory',
-                function ($q, $location, $localStorage, FlashService, $cacheFactory) {
+            $httpProvider.interceptors.push(['$q', '$injector', '$location', '$localStorage', '$cacheFactory',
+                function ($q, $injector, $location, $localStorage, $cacheFactory) {
                     return {
                         'request': function (config) {
                             // Clean cache if we need to
@@ -44,12 +55,15 @@
                             return config;
                         },
                         'response': function (res) {
+                            // TODO: Do not show when cache is used
+                            if (res.data.message)
+                                $injector.get('Notification').success('API: ' + res.data.message);
                             if (res.data.data)
                                 res.data = res.data.data;
                             return res;
                         },
                         'responseError': function (res) {
-                            FlashService.Error(res.data.message);
+                            $injector.get('Notification').error('API: ' + res.data.message);
                             if (res.status === 401 || res.status === 403) {
                                 delete $localStorage.token;
                                 $location.path('/login');

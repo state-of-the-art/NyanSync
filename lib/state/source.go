@@ -40,12 +40,30 @@ func SourceRemove(id string) {
 	state.Lock()
 	defer state.Unlock()
 	delete(state.Sources, id)
+	state.Save()
 }
 
 func (s *Source) Set(url string, _type string /* TODO: Options */) {
 	s.Url = url
 	s.Type = _type
 	s.Save()
+}
+
+func (s *Source) SaveRename(old_id string) error {
+	if err := isValidId(old_id); err != nil {
+		return err
+	}
+	if err := s.IsValid(); err != nil {
+		return err
+	}
+	state.Lock()
+	defer state.Unlock()
+	if old_id != s.Id {
+		delete(state.Sources, old_id)
+	}
+	state.Sources[s.Id] = *s
+	state.Save()
+	return nil
 }
 
 func (s *Source) Save() error {
@@ -60,8 +78,8 @@ func (s *Source) Save() error {
 }
 
 func (s *Source) IsValid() error {
-	if s.Id == "" {
-		return errors.New(InvalidSourceId)
+	if err := isValidId(s.Id); err != nil {
+		return err
 	}
 	if _, err := url.ParseRequestURI(s.Url); err != nil {
 		return errors.Wrap(err, InvalidSourceUrl)
@@ -70,5 +88,12 @@ func (s *Source) IsValid() error {
 		return errors.New(InvalidSourceType)
 	}
 
+	return nil
+}
+
+func isValidId(id string) error {
+	if id == "" {
+		return errors.New(InvalidSourceId)
+	}
 	return nil
 }
