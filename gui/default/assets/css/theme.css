@@ -13,3 +13,10 @@
   animation-iteration-count: infinite;
   animation-timing-function: linear;
 }
+
+.file_name_text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0px;
+}

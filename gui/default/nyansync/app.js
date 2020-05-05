@@ -28,7 +28,7 @@
                 .when('/', {
                     controller: 'HomeController',
                     templateUrl: 'nyansync/home/home.view.html',
-                    controllerAs: 'vm',
+                    controllerAs: 'hm',
                 })
                 .when('/login', {
                     controller: 'LoginController',
