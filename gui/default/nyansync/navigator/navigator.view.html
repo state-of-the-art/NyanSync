@@ -2,11 +2,15 @@
   <h3 id="navigator_tree" translate>Navigator</h3>
   <div class="panel panel-default" id="navigator">
     <div class="panel-heading">
-      <h3 class="panel-title">{{ vm.navigator_path }}</h3>
+      <h3 class="panel-title">
+        <a ng-click="vm.navigatePath([])">/</a><a
+          ng-repeat="name in vm.navigator_path track by $index"
+          ng-click="vm.navigatePath(vm.navigator_path.slice(0, $index+1))">{{ name }}/</a>
+      </h3>
     </div>
     <div class="panel-body">
       <div class="col-md-3" ng-repeat="item in vm.navigator_items" uib-tooltip="{{ item.Name }}">
-        <a href="#" class="thumbnail">
+        <a class="thumbnail" ng-click="vm.itemClick(item)">
           <img src="{{ item.Preview }}">
           <div class="caption"><p class="file_name_text">{{ item.Name }}</p></div>
         </a>

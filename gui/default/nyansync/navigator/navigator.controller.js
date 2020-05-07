@@ -3,19 +3,28 @@
 
   angular
     .module('app')
-    .controller('NavigatorController', ['$scope',
-      function ($scope) {
+    .controller('NavigatorController', ['$scope', 'NavigatorService',
+      function ($scope, NavigatorService) {
         var vm = this;
         $scope.vm = vm;
 
         (function initController() {
         })();
 
-        vm.navigator_path = '/asd/qweq/asdqwdq/qweqweqet/qeqweqwe/qwe/asdqwd/qwrqwr/qwe';
-        vm.navigator_items = [{
-          Name: 'test_file.jpg',
-          Preview: '/assets/img/favicon-default.generated.png',
-        }];
+        vm.navigator_path = [];
+
+        vm.navigatePath = function(path) {
+          vm.navigator_path = path;
+          vm.navigator_items = NavigatorService.query(vm.navigator_path);
+        }
+        vm.navigateChildren = function(name) {
+          vm.navigatePath(vm.navigator_path.concat([name]));
+        }
+        vm.itemClick = function(item) {
+          vm.navigateChildren(item.Name);
+        };
+
+        vm.navigatePath([]);
       }
     ]);
 

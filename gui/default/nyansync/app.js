@@ -49,7 +49,7 @@
 
                             // Inject auth header
                             config.headers = config.headers || {};
-                            if ($localStorage.token) {
+                            if( $localStorage.token && config.url.startsWith('/api') ) {
                                 config.headers.Authorization = 'Bearer ' + $localStorage.token;
                             }
                             return config;

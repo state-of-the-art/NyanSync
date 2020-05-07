@@ -87,6 +87,11 @@ func InitV1(router *gin.Engine) {
 			source.POST("/:id", SourcePost)
 			source.DELETE("/:id", SourceDelete)
 		}
+		navigate := v1.Group("/navigate")
+		navigate.Use(api_data.JWT.MiddlewareFunc())
+		{
+			navigate.GET("/*path", NavigateGetList)
+		}
 	}
 }
 

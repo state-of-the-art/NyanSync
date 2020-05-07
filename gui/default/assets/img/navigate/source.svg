@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg2651"
+   version="1.1"
+   height="1408"
+   width="1664">
+  <metadata
+     id="metadata2657">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs2655" />
+  <path
+     id="path2649"
+     d="M 1536,1184 V 480 c 0,-53 -43,-96 -96,-96 H 736 c -53,0 -96,-43 -96,-96 v -64 c 0,-53 -43,-96 -96,-96 H 224 c -53,0 -96,43 -96,96 v 960 c 0,53 43,96 96,96 h 1216 c 53,0 96,-43 96,-96 z m 128,-704 v 704 c 0,123 -101,224 -224,224 H 224 C 101,1408 0,1307 0,1184 V 224 C 0,101 101,0 224,0 h 320 c 123,0 224,101 224,224 v 32 h 672 c 123,0 224,101 224,224 z" />
+  <g
+     id="text2661"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:1.25;font-family:QUAKE2;-inkscape-font-specification:QUAKE2;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+     aria-label="SRC">
+    <path
+       id="path2682"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:533.33331299px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:center;text-anchor:middle"
+       d="m 556.83725,626.25941 v 82.29167 q -32.03125,-14.32292 -62.5,-21.61459 -30.46875,-7.29166 -57.55208,-7.29166 -35.9375,0 -53.125,9.89583 -17.1875,9.89583 -17.1875,30.72917 0,15.625 11.45834,24.47916 11.71875,8.59375 42.1875,14.84375 l 42.70833,8.59375 q 64.84374,13.02083 92.18749,39.58333 27.34375,26.5625 27.34375,75.52083 0,64.32292 -38.28125,95.83333 -38.02083,31.25002 -116.40624,31.25002 -36.97917,0 -74.21875,-7.0313 -37.23958,-7.03122 -74.47916,-20.8333 v -84.63541 q 37.23958,19.79166 71.87499,29.94791 34.89584,9.89584 67.1875,9.89584 32.8125,0 50.26042,-10.9375 17.44791,-10.9375 17.44791,-31.25 0,-18.22917 -11.97916,-28.125 -11.71875,-9.89584 -47.13542,-17.70833 l -38.80208,-8.59375 q -58.33333,-12.5 -85.41666,-39.84375 -26.82292,-27.34375 -26.82292,-73.69792 0,-58.07291 37.5,-89.32291 37.5,-31.25 107.8125,-31.25 32.03124,0 65.88541,4.94792 33.85416,4.6875 70.05208,14.32291 z" />
+    <path
+       id="path2684"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:533.33331299px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:center;text-anchor:middle"
+       d="m 813.08725,786.41566 q 31.51042,0 45.05209,-11.71875 13.80208,-11.71875 13.80208,-38.54167 0,-26.5625 -13.80208,-38.02083 -13.54167,-11.45833 -45.05209,-11.45833 h -42.18749 v 99.73958 z m -42.18749,69.27083 V 1002.8219 H 670.63934 V 614.01983 h 153.125 q 76.82291,0 112.49999,25.78125 35.9375,25.78125 35.9375,81.51041 0,38.54167 -18.75,63.28125 -18.48958,24.73958 -55.98958,36.45833 20.57292,4.6875 36.71875,21.35417 16.40625,16.40625 33.07292,50 L 1021.681,1002.8219 H 914.91017 l -47.39583,-96.61458 q -14.32292,-29.16667 -29.16667,-39.84375 -14.58333,-10.67708 -39.0625,-10.67708 z" />
+    <path
+       id="path2686"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:533.33331299px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:center;text-anchor:middle"
+       d="m 1389.3893,981.46773 q -27.6042,14.32292 -57.5521,21.61457 -29.9479,7.2917 -62.5,7.2917 -97.1354,0 -153.9062,-54.16668 -56.7709,-54.42708 -56.7709,-147.39583 0,-93.22916 56.7709,-147.39583 56.7708,-54.42708 153.9062,-54.42708 32.5521,0 62.5,7.29167 29.9479,7.29166 57.5521,21.61458 v 80.46875 q -27.8646,-19.01042 -54.9479,-27.86459 -27.0834,-8.85416 -57.0313,-8.85416 -53.6458,0 -84.375,34.375 -30.7291,34.375 -30.7291,94.79166 0,60.15625 30.7291,94.53125 30.7292,34.375 84.375,34.375 29.9479,0 57.0313,-8.85417 27.0833,-8.85417 54.9479,-27.86458 z" />
+  </g>
+</svg>

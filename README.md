@@ -11,6 +11,13 @@ tls etc.
 ## Usage
 TODO
 
+## TODO
+
+* Dynamically update sources list and any data from backend
+* Refresh JWT token for active user
+* Login page shoud close all modal windows
+* Implement application settings modal
+
 ## Build
 
 Install `imagemagick` (convert used to generate png files)
