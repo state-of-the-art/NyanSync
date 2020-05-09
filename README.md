@@ -17,6 +17,8 @@ TODO
 * Refresh JWT token for active user
 * Login page shoud close all modal windows
 * Implement application settings modal
+* Remove admin password file on first login
+* First user login - ask to change password
 
 ## Build
 

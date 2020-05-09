@@ -6,6 +6,7 @@ package main
 
 import (
 	"github.com/state-of-the-art/NyanSync/lib/core"
+	_ "github.com/state-of-the-art/NyanSync/lib/processors/uri_file"
 )
 
 func main() {
