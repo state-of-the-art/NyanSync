@@ -11,7 +11,7 @@ type Config struct {
 	}
 	Sources   map[string]Source   // List of sources
 	Receivers map[string]struct { // List of receivers to trigger playback
-		Url     string       `cfgRequired:"true"` // Address of a receiver or name and params
+		Uri     string       `cfgRequired:"true"` // Address of a receiver or name and params
 		Type    string       `cfgRequired:"true"` // Some type
 		Options []OptionItem // Options depends on the receiver type // TODO: subtitles, change audio stream...
 	}
@@ -24,7 +24,7 @@ type Config struct {
 }
 
 type Source struct {
-	Url     string       `cfgRequired:"true"` // file://, http://, https://
+	Uri     string       `cfgRequired:"true"` // file://, http://, https://
 	Type    string       `cfgRequired:"true"` // file, directory, syncthing, glob
 	Options []OptionItem // Options depends on the source type // TODO: media, video, audio, photo, xml/others common remote
 }

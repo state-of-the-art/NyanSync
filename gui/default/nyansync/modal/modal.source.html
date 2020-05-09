@@ -9,11 +9,11 @@
       <span ng-show="form.source_id.$dirty && form.source_id.$error.required" class="help-block">Name is required</span>
       <span ng-show="form.source_id.$dirty && form.source_id.$error.sourceid" class="help-block">Specified name is not unique</span>
     </div>
-    <div class="form-group" ng-class="{ 'has-error': form.source_url.$dirty && form.source_url.$invalid }">
-      <label for="source_url">URL</label>
-      <input type="url" ng-model="source.Url" name="source_url" class="form-control" placeholder="Source URL like 'file:///data/' or 'http://site.org/data/'" required />
-      <span ng-show="form.source_url.$dirty && form.source_url.$error.required" class="help-block">URL is required</span>
-      <span ng-show="form.source_url.$dirty && form.source_url.$error.url" class="help-block">Invalid URL format</span>
+    <div class="form-group" ng-class="{ 'has-error': form.source_uri.$dirty && form.source_uri.$invalid }">
+      <label for="source_uri">URI</label>
+      <input type="url" ng-model="source.Uri" name="source_uri" class="form-control" placeholder="Source URI like 'file:///data/' or 'http://site.org/data/'" required />
+      <span ng-show="form.source_uri.$dirty && form.source_uri.$error.required" class="help-block">URI is required</span>
+      <span ng-show="form.source_uri.$dirty && form.source_uri.$error.url" class="help-block">Invalid URI format</span>
     </div>
     <div class="form-group" ng-class="{ 'has-error': form.source_type.$dirty && form.source_type.$invalid }">
       <!-- TODO: list of available types -->

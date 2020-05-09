@@ -11,7 +11,7 @@ import (
 
 const (
 	InvalidSourceId   = "Invalid source Id"
-	InvalidSourceUrl  = "Invalid source URL"
+	InvalidSourceUri  = "Invalid source URI"
 	InvalidSourceType = "Invalid source Type"
 )
 
@@ -43,8 +43,8 @@ func SourceRemove(id string) {
 	state.Save()
 }
 
-func (s *Source) Set(url string, _type string /* TODO: Options */) {
-	s.Url = url
+func (s *Source) Set(uri string, _type string /* TODO: Options */) {
+	s.Uri = uri
 	s.Type = _type
 	s.Save()
 }
@@ -81,8 +81,8 @@ func (s *Source) IsValid() error {
 	if err := isValidId(s.Id); err != nil {
 		return err
 	}
-	if _, err := url.ParseRequestURI(s.Url); err != nil {
-		return errors.Wrap(err, InvalidSourceUrl)
+	if _, err := url.ParseRequestURI(s.Uri); err != nil {
+		return errors.Wrap(err, InvalidSourceUri)
 	}
 	if s.Type == "" {
 		return errors.New(InvalidSourceType)

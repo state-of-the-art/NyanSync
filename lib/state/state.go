@@ -50,7 +50,7 @@ func SourcesUpdate(cfg_sources map[string]config.Source) {
 	// Update the state sources according the config
 	for id := range cfg_sources {
 		s := SourceGet(id)
-		s.Set(cfg_sources[id].Url, cfg_sources[id].Type)
+		s.Set(cfg_sources[id].Uri, cfg_sources[id].Type)
 	}
 
 	// Removing not existing sources from state

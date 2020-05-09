@@ -1,7 +1,7 @@
 <div>
   <h3 id="sources_list" translate>Sources</h3>
   <div class="panel-group" id="sources">
-    <div class="panel panel-default" ng-repeat="source in vm.sources">
+    <div class="panel panel-default" ng-repeat="source in vm.sources | orderBy:'Id'">
       <!-- Source Head -->
       <button class="btn panel-heading" data-toggle="collapse" data-parent="#sources" data-target="#source-{{$index}}" aria-expanded="false">
         <h4 class="panel-title">
@@ -24,9 +24,9 @@
                 <td class="text-right no-overflow-ellipse">{{source.Id}}</td>
               </tr>
               <tr>
-                <th><span class="fas fa-fw fa-folder-open"></span>&nbsp;<span translate>Source URL</span></th>
+                <th><span class="fas fa-fw fa-folder-open"></span>&nbsp;<span translate>Source URI</span></th>
                 <td class="text-right">
-                  <span tooltip data-original-title="{{source.Url}}">{{source.Url}}</span>
+                  <span tooltip data-original-title="{{source.Uri}}">{{source.Uri}}</span>
                 </td>
               </tr>
               <tr>
