@@ -5,16 +5,10 @@
 package main
 
 import (
-	"fmt"
-
-	"github.com/state-of-the-art/NyanSync/lib/config"
 	"github.com/state-of-the-art/NyanSync/lib/core"
 )
 
 func main() {
-	cfg := config.Load()
-	fmt.Printf("%+v\n", cfg)
-
-	core.Init(cfg)
+	core.Init()
 	core.RunHTTPServer()
 }

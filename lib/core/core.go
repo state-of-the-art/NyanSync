@@ -11,13 +11,11 @@ import (
 	"github.com/state-of-the-art/NyanSync/lib/state"
 )
 
-func Init(configuration *config.Config) {
-	// Init cfg variable
-	cfg = configuration
+func Init() {
+	config.Load()
 
 	// Init state
-	state.Init(cfg.StateFilePath)
-	state.SourcesUpdate(cfg.Sources)
+	state.Init()
 }
 
 func RunHTTPServer() {
@@ -26,14 +24,7 @@ func RunHTTPServer() {
 	router.RedirectFixedPath = false
 
 	api.InitV1(router)
-	gui.Init(cfg.GuiPath, router)
+	gui.Init(config.Cfg().GuiPath, router)
 
-	log.Fatal(router.Run(cfg.Endpoint.Address))
+	log.Fatal(router.Run(config.Cfg().Endpoint.Address))
 }
-
-func ConfigUpdateSource(id string, src *config.Source) {
-	cfg.SourceSet(id, src)
-}
-
-// Core configuration
-var cfg = &config.Config{}

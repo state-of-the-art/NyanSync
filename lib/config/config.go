@@ -45,8 +45,8 @@ func (cfg *Config) Save() {
 	}()
 }
 
-func Load() *Config {
-	cfg := &Config{}
+func Load() {
+	cfg = &Config{}
 
 	goconfig.Path = location.DefaultConfigDir()
 	goconfig.File = "nyansync.yaml"
@@ -57,6 +57,11 @@ func Load() *Config {
 	}
 
 	cfg.Save()
+}
 
+// Core configuration
+var cfg = &Config{}
+
+func Cfg() *Config {
 	return cfg
 }

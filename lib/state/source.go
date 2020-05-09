@@ -63,6 +63,7 @@ func (s *Source) SaveRename(old_id string) error {
 	}
 	state.Sources[s.Id] = *s
 	state.Save()
+	config.Cfg().SourceSet(s.Id, s.Source)
 	return nil
 }
 
@@ -74,6 +75,7 @@ func (s *Source) Save() error {
 	defer state.Unlock()
 	state.Sources[s.Id] = *s
 	state.Save()
+	config.Cfg().SourceSet(s.Id, s.Source)
 	return nil
 }
 
