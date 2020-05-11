@@ -7,7 +7,7 @@
         query: { // Input params - array with path items
           method: 'GET',
           isArray: true,
-          cache : true,
+          cache : false, // TODO: enable to optimze
           interceptor: {
             request: function(config) {
               if( config.params ) {

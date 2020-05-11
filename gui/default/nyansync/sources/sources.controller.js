@@ -50,6 +50,7 @@
               source: function(){ return source; },
             },
           }).result.then(function () {
+            // TODO: update cache when URI was changed
             // Update the whole list of sources from API
             vm.sources = SourceService.query({cache: false});
           });
