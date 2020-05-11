@@ -65,6 +65,7 @@ func NavigateGetList(c *gin.Context) {
 			out = append(out, NavigateItem{
 				FileSystemItem: processors.FileSystemItem{
 					Name: v.Id,
+					Type: processors.Folder,
 				},
 				Preview: "/assets/img/navigate/source.svg",
 			})
