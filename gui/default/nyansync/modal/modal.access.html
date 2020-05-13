@@ -1,0 +1,41 @@
+<div class="modal-header">
+  <h3 class="modal-title" id="modal-title">{{ vm.title }}</h3>
+</div>
+<form name="form" role="form" ng-submit="vm.submit()">
+  <div class="modal-body" id="modal-body">
+    <div class="form-group" ng-class="{ 'has-error': form.source_id.$dirty && form.source_id.$invalid }">
+      <label for="source_id">Source Name</label>
+      <input type="text" ng-model="access.SourceId" name="source_id" class="form-control" placeholder="Name of the source to access" required my-source-id-exist />
+      <span ng-show="form.source_id.$dirty && form.source_id.$error.required" class="help-block">Source Name is required</span>
+      <span ng-show="form.source_id.$dirty && form.source_id.$error.sourceid" class="help-block">Specified source not found</span>
+    </div>
+    <div class="form-group" ng-class="{ 'has-error': form.access_path.$dirty && form.access_path.$invalid }">
+      <label for="access_path">Path</label>
+      <input type="text" ng-model="access.Path" name="access_path" class="form-control" placeholder="Access path to the required resource" required />
+      <span ng-show="form.access_path.$dirty && form.access_path.$error.required" class="help-block">Path is required</span>
+    </div>
+    <div class="form-group" ng-class="{ 'has-error': form.source_type.$dirty && form.source_type.$invalid }">
+      <label for="access_users">User</label>
+      <tags-input ng-model="access_users" name="access_users" add-on-paste="true" min-tags="1" placeholder="Users have this access">
+        <auto-complete source="vm.loadUsers($query)" min-length="0" load-on-focus="true" load-on-empty="true" max-results-to-show="32"></auto-complete>
+      </tags-input>
+      <span ng-show="form.access_users.$dirty && form.access_users.$error.valid" class="help-block">At least one user is required</span>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <i ng-if="vm.data_loading" class="fa fa-spinner loading-progress" aria-hidden="true"></i>
+    <span class="tooltip-wrapper" title="{{ !form.$dirty || form.$invalid ? 'Form not changed or invalid' : '' }}">
+      <button class="btn btn-primary" type="submit" ng-disabled="!form.$dirty || form.$invalid || vm.data_loading">
+        <span class="fas fa-check"></span>&nbsp;<span translate>Save</span>
+      </button>
+    </span>
+    <button class="btn btn-default" type="button" ng-click="vm.cancel()">
+      <span class="fas fa-times"></span>&nbsp;<span translate>Cancel</span>
+    </button>
+    <span class="tooltip-wrapper pull-left" title="{{ form.$dirty ? 'Remove not available for changed item' : '' }}">
+      <button type="button" class="btn btn-warning" ng-click="vm.remove()" ng-if="source._orig_id" ng-disabled="form.$dirty">
+        <span class="fas fa-minus-circle"></span>&nbsp;<span translate>Remove</span>
+      </button>
+    </span>
+  </div>
+</form>

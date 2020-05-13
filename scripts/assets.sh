@@ -56,6 +56,13 @@ get https://cdnjs.cloudflare.com/ajax/libs/angular-ui-notification/0.3.6/angular
 get https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap-tpls.min.js \
     f692082f69c296cc7635b01e1fef8173c27dac54 gui/default/vendor/ui-bootstrap/ui-bootstrap-tpls.min.js
 
+get https://cdnjs.cloudflare.com/ajax/libs/ng-tags-input/3.2.0/ng-tags-input.min.js \
+    378277909137a03f40491925c6f6d6eb6b4825c0 gui/default/vendor/ng-tags-input/ng-tags-input.min.js
+get https://cdnjs.cloudflare.com/ajax/libs/ng-tags-input/3.2.0/ng-tags-input.min.css \
+    4ca54f68f0cbd06d143ecdcc7f812aa58580759e gui/default/vendor/ng-tags-input/ng-tags-input.min.css
+get https://cdnjs.cloudflare.com/ajax/libs/ng-tags-input/3.2.0/ng-tags-input.bootstrap.min.css \
+    50972d6160516291b832426fea5877a0db4fe706 gui/default/vendor/ng-tags-input/ng-tags-input.bootstrap.min.css
+
 # 3.4.1 due to issue with pane in bootstrap https://github.com/twbs/bootstrap/issues/30553
 #get https://code.jquery.com/jquery-3.5.0.min.js \
 #    1d6ae46f2ffa213dede37a521b011ec1cd8d1ad3 gui/default/vendor/jquery/jquery.min.js

@@ -1,23 +1,22 @@
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('app')
-        .controller('QuestionController', ['body', '$uibModalInstance',
-            function (body, $uibModalInstance) {
-                var vm = this;
+  angular
+    .module('app')
+    .controller('QuestionController', ['body', '$uibModalInstance',
+      function (body, $uibModalInstance) {
+          var vm = this;
 
-                vm.body = body
+          vm.body = body
 
-                vm.confirm = function () {
-                    $uibModalInstance.close(true);
-                };
+          vm.confirm = function () {
+            $uibModalInstance.close(true);
+          };
 
-                vm.cancel = function () {
-                    $uibModalInstance.dismiss('cancel');
-                };
-
-            }
-        ]);
+          vm.cancel = function () {
+            $uibModalInstance.dismiss('cancel');
+          };
+        }
+      ]);
 
 })();

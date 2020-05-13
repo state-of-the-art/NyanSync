@@ -3,8 +3,8 @@
 
   angular
     .module('app')
-    .controller('NavigatorController', ['$scope', 'NavigatorService',
-      function ($scope, NavigatorService) {
+    .controller('NavigatorController', ['$scope', '$uibModal', 'NavigatorService', 'DropdownService',
+      function ($scope, $uibModal, NavigatorService, DropdownService) {
         var vm = this;
         $scope.vm = vm;
 
@@ -19,37 +19,29 @@
           vm.navigator_path = path;
           vm.navigator_items = NavigatorService.query(vm.navigator_path);
         };
+
         vm.navigateChildren = function(name) {
           vm.navigatePath(vm.navigator_path.concat([name]));
         };
+
         vm.itemMenu = function(item, e) {
           if( vm.navigator_active && vm.navigator_active !== item ) {
-            $(vm.navigator_active_el).parent().children('.dropdown').remove();
+            DropdownService.Remove($(vm.navigator_active_el).parent());
           }
           vm.navigator_active = item;
           vm.navigator_active_el = e.currentTarget;
           var p = $(e.currentTarget).parent();
-          if( p.children('.dropdown').length > 0 )
+          if( DropdownService.Exist(p) )
             return;
 
           // Create dropdown menu
-          // TODO: replace with actual actions
-          var el = $(
-            '<div class="dropdown" style="position:absolute">'+
-              '<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'+
-                '<span class="caret"></span>'+
-              '</button>'+
-              '<ul class="dropdown-menu">'+
-                '<li><a>Action</a></li>'+
-                '<li><a>Another action</a></li>'+
-                '<li><a>Something else here</a></li>'+
-                '<li role="separator" class="divider"></li>'+
-                '<li><a>Separated link</a></li>'+
-              '</ul>'+
-            '</div>');
-
-          p.prepend(el);
+          DropdownService.Create({
+            'Share': function() {
+              vm.shareItem(item);
+            },
+          }, p);
         };
+
         vm.itemClick = function(item, e) {
           if( item === vm.navigator_active ) {
             if( item.Type == 'folder' )
@@ -67,6 +59,27 @@
 
             vm.itemMenu(item, e);
           }
+        };
+
+        vm.shareItem = function(item) {
+          $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'nyansync/modal/modal.access.html',
+            controller: 'AccessController',
+            controllerAs: 'vm',
+            size: 'lg',
+            resolve: {
+              title: function(){ return 'Create new share'; },
+              source_id: function(){ return vm.navigator_path[0]; },
+              path: function(){ return vm.navigator_path.slice(1).concat(item.Name).join('/'); },
+              item: function(){ return item; },
+            },
+          }).result.then(function () {
+            // Update the whole list of sources from API
+            vm.sources = SourceService.query({cache: false});
+          });
         };
 
         vm.navigatePath([]);

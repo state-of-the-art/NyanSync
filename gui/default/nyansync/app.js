@@ -7,6 +7,7 @@
         'ngResource',
         'ui.bootstrap',
         'ui-notification',
+        'ngTagsInput',
     ])
         .constant('urls', {
             BASE: '/',
