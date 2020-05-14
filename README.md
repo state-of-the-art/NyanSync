@@ -1,10 +1,13 @@
-# NyanSync
+# NyanShare
 
 Sharing platform to face your files in the web.
 
-Originally based on [SyncThing](https://syncthing.net/) but could be used to share any source
+Originally based on [Syncthing](https://syncthing.net/) but could be used to share any source
 through your server or redirect to original sources. Will protect your files by token, user/pass,
 tls etc.
+
+* **NyanShare** - application to share your data with anyone
+* **NyanSync** - system to sync & share your files, combining NyanShare and Syncthing
 
 *WARNING:* development still in progress.
 
@@ -26,7 +29,7 @@ Install `imagemagick` (convert used to generate png files)
 
 Run `./build.sh` from repo or from clean workspace
 
-## Deploy on GCP
+## Deploy NyanSync to GCP
 
 You can relatively easy deploy NyanSync on Google Cloud Platform to get low cost and secured private
 file sharing system. That will require some knowledge about how GCP is working, but overall it's not

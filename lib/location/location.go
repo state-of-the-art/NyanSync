@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	AppName = "NyanSync"
+	AppName = "NyanShare"
 )
 
 func ExpandTilde(path string) string {

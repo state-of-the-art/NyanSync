@@ -10,17 +10,17 @@
         (function initController() {
         })();
       }
-    ]).directive('nyansyncsources', function(){
+    ]).directive('nyanshareSources', function(){
       return {
         restrict: 'A',
         replace: true,
-        templateUrl:'nyansync/sources/sources.view.html',
+        templateUrl:'nyanshare/sources/sources.view.html',
       }
-    }).directive('nyansyncnavigator', function(){
+    }).directive('nyanshareNavigator', function(){
       return {
         restrict: 'A',
         replace: true,
-        templateUrl:'nyansync/navigator/navigator.view.html',
+        templateUrl:'nyanshare/navigator/navigator.view.html',
       }
     });
 

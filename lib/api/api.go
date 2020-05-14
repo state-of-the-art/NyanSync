@@ -14,7 +14,7 @@ func initAuthV1() {
 	identity_key := "id"
 
 	mw, err := jwt.New(&jwt.GinJWTMiddleware{
-		Realm:       "nyansync jwt",
+		Realm:       "nyanshare jwt",
 		Key:         []byte("secret key"), // TODO: replace
 		MaxRefresh:  time.Hour,
 		IdentityKey: identity_key,

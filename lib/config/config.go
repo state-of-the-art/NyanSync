@@ -49,7 +49,7 @@ func Load() {
 	cfg = &Config{}
 
 	goconfig.Path = location.DefaultConfigDir()
-	goconfig.File = "nyansync.yaml"
+	goconfig.File = "nyanshare.yaml"
 
 	cfg.FilePathSet(filepath.Join(goconfig.Path, goconfig.File))
 	if err := goconfig.Parse(cfg); err != nil {

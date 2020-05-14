@@ -15,9 +15,9 @@ type Config struct {
 		Type    string       `cfgRequired:"true"` // Some type
 		Options []OptionItem // Options depends on the receiver type // TODO: subtitles, change audio stream...
 	}
-	StateFilePath   string `cfgDefault:"nyansync_state.json"`   // If relative - config dir path
-	AccessFilePath  string `cfgDefault:"nyansync_access.json"`  // If relative - config dir path
-	CatalogFilePath string `cfgDefault:"nyansync_catalog.json"` // If relative - config dir path
+	StateFilePath   string `cfgDefault:"nyanshare_state.json"`   // If relative - config dir path
+	AccessFilePath  string `cfgDefault:"nyanshare_access.json"`  // If relative - config dir path
+	CatalogFilePath string `cfgDefault:"nyanshare_catalog.json"` // If relative - config dir path
 
 	// Used to override the gui path, if set to empty - using embedded gui resources
 	GuiPath string `cfgDefault:""` // If relative - current working directory

@@ -28,12 +28,12 @@
             $routeProvider
                 .when('/', {
                     controller: 'HomeController',
-                    templateUrl: 'nyansync/home/home.view.html',
+                    templateUrl: 'nyanshare/home/home.view.html',
                     controllerAs: 'hm',
                 })
                 .when('/login', {
                     controller: 'LoginController',
-                    templateUrl: 'nyansync/login/login.view.html',
+                    templateUrl: 'nyanshare/login/login.view.html',
                     controllerAs: 'vm',
                 })
                 .otherwise({ redirectTo: '/' });

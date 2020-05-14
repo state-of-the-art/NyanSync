@@ -43,7 +43,7 @@
             animation: true,
             ariaLabelledBy: 'modal-title',
             ariaDescribedBy: 'modal-body',
-            templateUrl: 'nyansync/modal/modal.question.html',
+            templateUrl: 'nyanshare/modal/modal.question.html',
             controller: 'QuestionController',
             controllerAs: 'vm',
             size: 'sm',

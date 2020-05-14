@@ -66,7 +66,7 @@
             animation: true,
             ariaLabelledBy: 'modal-title',
             ariaDescribedBy: 'modal-body',
-            templateUrl: 'nyansync/modal/modal.access.html',
+            templateUrl: 'nyanshare/modal/modal.access.html',
             controller: 'AccessController',
             controllerAs: 'vm',
             size: 'lg',
