@@ -1,10 +1,10 @@
-(function () {
+(function() {
   'use strict';
 
   angular
     .module('app')
     .controller('NavigatorController', ['$scope', '$uibModal', 'NavigatorService', 'DropdownService',
-      function ($scope, $uibModal, NavigatorService, DropdownService) {
+      function( $scope, $uibModal, NavigatorService, DropdownService ) {
         var vm = this;
         $scope.vm = vm;
 
@@ -76,7 +76,7 @@
               path: function(){ return vm.navigator_path.slice(1).concat(item.Name).join('/'); },
               item: function(){ return item; },
             },
-          }).result.then(function () {
+          }).result.then(function() {
             // Update the whole list of sources from API
             vm.sources = SourceService.query({cache: false});
           });

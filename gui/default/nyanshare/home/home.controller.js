@@ -1,10 +1,10 @@
-(function () {
+(function() {
   'use strict';
 
   angular
     .module('app')
     .controller('HomeController', [
-      function () {
+      function() {
         var vm = this;
 
         (function initController() {

@@ -1,118 +1,118 @@
 body {
-    padding-bottom: 70px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  padding-bottom: 70px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 h1, h2, h3, h4, h5 {
-    font-family: "Raleway", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    line-height: 1.25;
+  font-family: "Raleway", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  line-height: 1.25;
 }
 
 ul+h5 {
-    margin-top: 1.5em;
+  margin-top: 1.5em;
 }
 
 #content {
-    margin-bottom: 50px;
+  margin-bottom: 50px;
 }
 
 .panel-progress {
-    height: 3px;
-    left: 0;
-    position: absolute;
-    top: 0;
-    display: block;
+  height: 3px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  display: block;
 }
 
 .checkbox {
-    margin-top: 0px;
+  margin-top: 0px;
 }
 
 .checkbox input[type="checkbox"], .radio input[type="radio"] {
-    float: none; /* issue #1197 */
+  float: none; /* issue #1197 */
 }
 
 .popover {
-    max-width: none;
-    min-width: 250px;
+  max-width: none;
+  min-width: 250px;
 }
 
 .tooltip {
-    word-wrap:break-word;
+  word-wrap:break-word;
 }
 
 .text-monospace {
-    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
 .table-condensed>thead>tr>th, .table-condensed>tbody>tr>th, .table-condensed>tfoot>tr>th, .table-condensed>thead>tr>td, .table-condensed>tbody>tr>td, .table-condensed>tfoot>tr>td {
-    border-top: none;
+  border-top: none;
 }
 
 .logo {
-    margin: 0;
-    padding: 0;
-    top: -5px;
-    position: relative;
+  margin: 0;
+  padding: 0;
+  top: -5px;
+  position: relative;
 }
 
 .list-no-bullet {
-    list-style-type: none;
+  list-style-type: none;
 }
 
 .li-column {
-    display: inline-block;
-    min-width: 7em;
-    margin-right: 1em;
-    padding: 1px 4px;
-    margin: 2px 2px;
+  display: inline-block;
+  min-width: 7em;
+  margin-right: 1em;
+  padding: 1px 4px;
+  margin: 2px 2px;
 }
 .li-column span.data {
-    margin-left: 0.5em;
-    min-width: 10em;
-    text-align: right;
-    display: inline-block;
+  margin-left: 0.5em;
+  min-width: 10em;
+  text-align: right;
+  display: inline-block;
 }
 
 .ng-cloak {
-    display: none !important;
+  display: none !important;
 }
 
 .table th {
-    white-space: nowrap;
-    font-weight: 400;
+  white-space: nowrap;
+  font-weight: 400;
 }
 
 .table td {
-    /*padding-left: 20px !important;*/
+  /*padding-left: 20px !important;*/
 }
 
 .table td.small-data {
-    white-space: nowrap;
+  white-space: nowrap;
 }
 
 /* Removing text decoration on anchor link hover pull request: #4135 */
 .table td.small-data span a:hover {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 table.table-condensed {
-    table-layout: fixed;
+  table-layout: fixed;
 }
 
 table.table-dynamic {
-    word-wrap: break-word;
-    word-break: break-all;
+  word-wrap: break-word;
+  word-break: break-all;
 }
 
 table.table-condensed td {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 table.table-condensed td.no-overflow-ellipse {
-    white-space: normal;
+  white-space: normal;
 }
 
 table.table-auto {
@@ -124,60 +124,60 @@ table.table-auto th {
 }
 
 table.table-auto td {
-    max-width: 0px;
+  max-width: 0px;
 }
 
 .folder-advanced {
-    padding: 1rem;
-    margin-bottom: 15px;
+  padding: 1rem;
+  margin-bottom: 15px;
 }
 
 .folder-advanced-toggle {
-    cursor: pointer;
+  cursor: pointer;
 }
 .folder-advanced-toggle .collapse,
 .folder-advanced-toggle.collapsed .expand {
-    display: inline-block;
+  display: inline-block;
 }
 
 .folder-advanced-toggle.collapsed .collapse,
 .folder-advanced-toggle .expand{
-    display: none;
+  display: none;
 }
 
 *[language-select] > .dropdown-menu {
-    width: 450px;
+  width: 450px;
 }
 
 *[language-select] > .dropdown-menu > li {
-    float: left;
-    width: 50%;
+  float: left;
+  width: 50%;
 }
 
 *[language-select] > .dropdown-menu > li > a {
-    overflow: hidden;
-    text-overflow: ellipsis;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nav>li{
-    float: left;
+  float: left;
 }
 .navbar-right {
-    /* to align with panel */
-    padding-right: 15px;
-    float: right;
+  /* to align with panel */
+  padding-right: 15px;
+  float: right;
 }
 
 .panel-body .table-condensed {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .dl-horizontal.dl-narrow dt {
-    width: 40px;
+  width: 40px;
 }
 
 .dl-horizontal.dl-narrow dd {
-    margin-left: 60px;
+  margin-left: 60px;
 }
 
 /**
@@ -185,56 +185,56 @@ table.table-auto td {
  */
 
 .panel-icon {
-    float: left;
-    margin-right: 15px;
-    margin-top: 0.125em;
-    margin-bottom: 0.125em;
-    line-height: 1;
+  float: left;
+  margin-right: 15px;
+  margin-top: 0.125em;
+  margin-bottom: 0.125em;
+  line-height: 1;
 }
 
 .modal-title .panel-icon {
-    margin-top: 0.25em;
-    margin-bottom: 0.25em;
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
 }
 
 button.panel-heading {
-    display: block;
-    position: relative;
-    width: 100%;
-    text-align: left;
-    border-top-width: 0;
-    border-left-width: 0;
-    border-right-width: 0;
-    border-radius: 0 !important;
+  display: block;
+  position: relative;
+  width: 100%;
+  text-align: left;
+  border-top-width: 0;
+  border-left-width: 0;
+  border-right-width: 0;
+  border-radius: 0 !important;
 }
 
 .panel-heading .panel-title-text {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .panel-heading .panel-status {
-    margin-left:15px;
+  margin-left:15px;
 }
 
 identicon {
-    width: 1em;
-    height: 1em;
-    line-height: 1;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
 }
 
 .identicon {
-    width: 1em;
-    height: 1em;
+  width: 1em;
+  height: 1em;
 }
 
 a.toggler {
-    color: inherit;
+  color: inherit;
 }
 a.toggler:hover {
-    border-bottom: 1px dashed;
-    text-decoration: none;
+  border-bottom: 1px dashed;
+  text-decoration: none;
 }
 
 /**
@@ -242,7 +242,7 @@ a.toggler:hover {
  */
 
 .panel-collapse .panel-body {
-    padding: 5px;
+  padding: 5px;
 }
 
 /**
@@ -250,159 +250,159 @@ a.toggler:hover {
  */
 
 .progress {
-    margin-bottom: 0px;
-    position: relative;
+  margin-bottom: 0px;
+  position: relative;
 }
 
 .progress span.frontal {
-    text-align: center;
-    position: absolute;
-    display: block;
-    width: 100%;
+  text-align: center;
+  position: absolute;
+  display: block;
+  width: 100%;
 }
 
 .three-columns {
-    -webkit-column-count: 3;
-    -moz-column-count: 3;
-    column-count: 3;
+  -webkit-column-count: 3;
+  -moz-column-count: 3;
+  column-count: 3;
 }
 
 .two-columns {
-    -webkit-column-count: 2;
-    -moz-column-count: 2;
-    column-count: 2;
+  -webkit-column-count: 2;
+  -moz-column-count: 2;
+  column-count: 2;
 }
 
 ul.three-columns li, ul.two-columns li {
-    padding-left: 0.5em;
-    text-indent: -0.5em;
+  padding-left: 0.5em;
+  text-indent: -0.5em;
 }
 
 .navbar-fixed-bottom {
-    z-index: 980;
+  z-index: 980;
 }
 
 /** Footer nav on small devices **/
 @media (max-width: 1199px) {
-    /* Stay at the end of the page, with space reserved for the footer
-    usually taking up two rows. */
+  /* Stay at the end of the page, with space reserved for the footer
+  usually taking up two rows. */
 
-    html {
-        position: relative;
-        min-height: 100%;
-    }
+  html {
+    position: relative;
+    min-height: 100%;
+  }
 
-    body {
-        padding-bottom: 60px;
-    }
+  body {
+    padding-bottom: 60px;
+  }
 
-    .navbar-fixed-bottom {
-        position: absolute;
-    }
+  .navbar-fixed-bottom {
+    position: absolute;
+  }
 }
 
 @media (max-width: 768px) {
-    /* Layout after the normal contents, as this is when the footer switches
-    to a vertical layout. */
+  /* Layout after the normal contents, as this is when the footer switches
+  to a vertical layout. */
 
-    body {
-        padding-bottom: 0px;
-    }
+  body {
+    padding-bottom: 0px;
+  }
 
-    .navbar-brand {
-        margin: 3.25px -15px;
-    }
+  .navbar-brand {
+    margin: 3.25px -15px;
+  }
 
-    .navbar-fixed-bottom {
-        position: relative;
-    }
+  .navbar-fixed-bottom {
+    position: relative;
+  }
 
-    .navbar-nav .open .dropdown-menu {
-        position: absolute;
-        left: auto;
-        right: 0;
-        background-color: #ffffff;
-        border: 1px solid #cccccc;
-        border: 1px solid rgba(0, 0, 0, 0.15);
-        -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
-        border-radius: 2px;
-    }
+  .navbar-nav .open .dropdown-menu {
+    position: absolute;
+    left: auto;
+    right: 0;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    border-radius: 2px;
+  }
 
-    *[language-select] {
-        position: static !important;
-    }
+  *[language-select] {
+    position: static !important;
+  }
 
-    *[language-select] > .dropdown-menu {
-        margin-left: 15px;
-        margin-right: 15px;
-        margin-top: -12px !important;
-        max-width: 450px;
-        height: 265px;
-        overflow-y: scroll;
-    }
+  *[language-select] > .dropdown-menu {
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-top: -12px !important;
+    max-width: 450px;
+    height: 265px;
+    overflow-y: scroll;
+  }
 
-    table.table-condensed td {
-        /* for mobile phones to allow linebreaks in long repro folder/shared with
-        * columns. */
-        white-space: normal;
-    }
+  table.table-condensed td {
+    /* for mobile phones to allow linebreaks in long repro folder/shared with
+    * columns. */
+    white-space: normal;
+  }
 
-    .two-columns {
-        -webkit-column-count: 1;
-        -moz-column-count: 1;
-        column-count: 1;
-    }
+  .two-columns {
+    -webkit-column-count: 1;
+    -moz-column-count: 1;
+    column-count: 1;
+  }
 }
 
 @media (max-width:479px) {
 
-    nav .dropdown-toggle {
-        font-size: 1em;
-    }
+  nav .dropdown-toggle {
+    font-size: 1em;
+  }
 
-    .navbar-nav .open .dropdown-menu > li > a {
-        padding: 12px 15px 12px 25px;
-    }
+  .navbar-nav .open .dropdown-menu > li > a {
+    padding: 12px 15px 12px 25px;
+  }
 
-    .navbar-fixed-bottom li {
-         width: 100%;
-    }
+  .navbar-fixed-bottom li {
+     width: 100%;
+  }
 }
 
 .tab-content {
-    padding-top: 10px;
+  padding-top: 10px;
 }
 
 .fancytree-ext-table {
-    width: 100% !important;
+  width: 100% !important;
 }
 
 @media (max-width: 419px) {
-    /* the selectors are build to target only the content of folder and device
-       panels as it would "destroy" e.g. out of sync or recent changes listings */
-    div[id^='device-'].panel-collapse table,
-    div[id^='folder-'].panel-collapse table,
-    div[id^='device-'].panel-collapse tbody,
-    div[id^='folder-'].panel-collapse tbody,
-    div[id^='device-'].panel-collapse tr,
-    div[id^='folder-'].panel-collapse tr {
-        display: block;
-    }
-    div[id^='device-'].panel-collapse th,
-    div[id^='folder-'].panel-collapse th,
-    div[id^='device-'].panel-collapse td,
-    div[id^='folder-'].panel-collapse td {
-        display: block;
-        max-width: 100%;
-        width: 100%;
-    }
+  /* the selectors are build to target only the content of folder and device
+     panels as it would "destroy" e.g. out of sync or recent changes listings */
+  div[id^='device-'].panel-collapse table,
+  div[id^='folder-'].panel-collapse table,
+  div[id^='device-'].panel-collapse tbody,
+  div[id^='folder-'].panel-collapse tbody,
+  div[id^='device-'].panel-collapse tr,
+  div[id^='folder-'].panel-collapse tr {
+    display: block;
+  }
+  div[id^='device-'].panel-collapse th,
+  div[id^='folder-'].panel-collapse th,
+  div[id^='device-'].panel-collapse td,
+  div[id^='folder-'].panel-collapse td {
+    display: block;
+    max-width: 100%;
+    width: 100%;
+  }
 
-    /* all buttons, except panel headings, get bottom margin, as they won't fit
-       beside each other anymore */
-    .btn:not(.panel-heading),
-    /* this "+"-selector is needed to override some bootstrap defaults */
-    .btn:not(.panel-heading) + .btn:not(.panel-heading) {
-        margin-bottom: 1rem;
-    }
+  /* all buttons, except panel headings, get bottom margin, as they won't fit
+     beside each other anymore */
+  .btn:not(.panel-heading),
+  /* this "+"-selector is needed to override some bootstrap defaults */
+  .btn:not(.panel-heading) + .btn:not(.panel-heading) {
+    margin-bottom: 1rem;
+  }
 }

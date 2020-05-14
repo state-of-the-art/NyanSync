@@ -1,8 +1,8 @@
-(function () {
+(function() {
   'use strict';
 
   angular.module('app')
-    .factory('DropdownService', [function () {
+    .factory('DropdownService', [function() {
       var base = [
         '<div class="dropdown" style="position:absolute">',
           '<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',

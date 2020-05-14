@@ -1,8 +1,8 @@
-(function () {
+(function() {
   'use strict';
 
   angular.module('app')
-    .factory('NavigatorService', ['$resource', 'urls', function ($resource, urls) {
+    .factory('NavigatorService', ['$resource', 'urls', function( $resource, urls ) {
       return $resource(urls.BASE_API + 'navigate/:path', {path: '@path'}, {
         query: { // Input params - array with path items
           method: 'GET',

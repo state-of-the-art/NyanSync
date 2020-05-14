@@ -1,10 +1,10 @@
-(function () {
+(function() {
   'use strict';
 
   angular
     .module('app')
     .controller('AccessController', ['title', 'source_id', 'path', 'item', '$scope', '$uibModalInstance', '$uibModal', 'AccessService', 'UserService', 'SourceService',
-      function (title, source_id, path, item, $scope, $uibModalInstance, $uibModal, AccessService, UserService, SourceService) {
+      function( title, source_id, path, item, $scope, $uibModalInstance, $uibModal, AccessService, UserService, SourceService ) {
         var vm = this;
 
         vm.title = title;
@@ -26,7 +26,7 @@
           });
         })();
 
-        vm.submit = function () {
+        vm.submit = function() {
           if( !$scope.source._orig_id )
             $scope.source._orig_id = $scope.source.Id
           $scope.source.$save().then(function(){
@@ -34,11 +34,11 @@
           });
         };
 
-        vm.cancel = function () {
+        vm.cancel = function() {
           $uibModalInstance.dismiss('cancel');
         };
 
-        vm.remove = function () {
+        vm.remove = function() {
           $uibModal.open({
             animation: true,
             ariaLabelledBy: 'modal-title',
@@ -50,7 +50,7 @@
             resolve: {
               body: function(){ return 'Are you sure you want to remove source with name "' + source.Id + '"?'; },
             },
-          }).result.then(function (result) {
+          }).result.then(function( result ) {
             if( result === true ) {
               $scope.source.$remove().then(function(){
                 $uibModalInstance.close();
@@ -70,7 +70,7 @@
         require: 'ngModel',
         scope: true,
         link: function(scope, elm, attrs, ctrl) {
-          if (! ctrl)
+          if( !ctrl )
             return;
           ctrl.$validators.sourceid = function(modelValue, viewValue) {
             return scope.source_ids.indexOf(modelValue) !== -1;
