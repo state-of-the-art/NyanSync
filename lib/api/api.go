@@ -84,6 +84,7 @@ func InitV1(router *gin.Engine) {
 		user.Use(api_data.JWT.MiddlewareFunc())
 		{
 			user.GET("/", UsersGetList)
+			user.GET("/:id", UserGet)
 			user.POST("/:id", UserPost)
 			user.DELETE("/:id", UserDelete)
 		}

@@ -1,7 +1,7 @@
 package config
 
 type Config struct {
-	Base `yaml:",omitempty"`
+	Base `yaml:"-" json:"-"` // Ignore on marshalling
 
 	Endpoint struct { // HTTP endpoint configuration
 		Address     string `cfgDefault:"0.0.0.0:8680"`

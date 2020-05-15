@@ -44,6 +44,7 @@ func (u *User) Set(password string, name string, init bool) {
 	u.Name = name
 	u.PassHash = crypt.Generate(password, nil)
 	u.Init = init
+	state.Save()
 }
 
 func (u *User) Remove() {
@@ -57,6 +58,7 @@ func (u *User) Remove() {
 			return
 		}
 	}
+	state.Save()
 }
 
 func (u *User) CheckPassword(password string) bool {

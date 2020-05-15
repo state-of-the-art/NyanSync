@@ -3,10 +3,10 @@
 
   angular.module('app')
     .factory('UserService', ['$resource', 'urls', function( $resource, urls ) {
-      return $resource(urls.BASE_API + 'user/:Id', {Id: '@_orig_id'}, {
+      return $resource(urls.BASE_API + 'user/:Login', {Login: '@_orig_login'}, {
         query: {
           method: 'GET',
-          params: { Id: '' },
+          params: { Login: '' },
           isArray: true,
           cache : true,
         },

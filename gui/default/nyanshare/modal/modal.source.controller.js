@@ -43,7 +43,9 @@
             controllerAs: 'vm',
             size: 'sm',
             resolve: {
-              body: function(){ return 'Are you sure you want to remove source with name "' + source.Id + '"?'; },
+              body: function(){
+                return 'Are you sure you want to remove source "' + $scope.source._orig_id + '"?';
+              },
             },
           }).result.then(function( result ) {
             if( result === true ) {

@@ -19,8 +19,9 @@ type jwt_authenticate_body struct {
 }
 
 type User struct {
-	Login string
-	Name  string
+	Login    string
+	Name     string
+	Password string `json:"-"` // ignore on marshalling
 }
 
 type NavigateItem struct {
@@ -28,31 +29,56 @@ type NavigateItem struct {
 	Preview string
 }
 
+func toAPIUser(user *state.User) (api_user User) {
+	api_user.Login = user.Login
+	api_user.Name = user.Name
+	return
+}
+
 func UsersGetList(c *gin.Context) {
 	users := state.UsersList()
 	var out_users []User
 	for _, u := range users {
-		out_users = append(out_users, User{
-			Login: u.Login,
-			Name:  u.Name,
-		})
+		out_users = append(out_users, toAPIUser(&u))
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Get users list", "data": out_users})
 }
 
+func UserGet(c *gin.Context) {
+	login := c.Param("Login")
+	if user := state.UserFind(login); user != nil {
+		c.JSON(http.StatusOK, gin.H{"message": "Get user", "data": toAPIUser(user)})
+		return
+	}
+	c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
+}
+
 func UserPost(c *gin.Context) {
-	var data state.User
+	var data User
 	if err := c.ShouldBind(&data); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Wrong request body: %v", err)})
 		return
 	}
-	/*if err := data.SaveRename(c.Param("id")); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Unable to save user: %v", err)})
+
+	// TODO: IMPORTANT! make sure user have access to change this user
+
+	if data.Login == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Login can't be empty"})
 		return
 	}
+	user := state.UserGet(data.Login)
+	// Check if the password is correct to edit the user
+	if !user.PassHash.IsEmpty() && !user.CheckPassword(data.Password) {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Wrong password to edit user"})
+		return
+	}
+	// Remove init flag when user saved twice
+	if !user.PassHash.IsEmpty() {
+		user.Init = false
+	}
+	user.Set(data.Password, data.Name, user.Init)
 
-	c.JSON(http.StatusOK, gin.H{"message": "User stored"})*/
-	c.JSON(http.StatusBadRequest, gin.H{"message": "Save user not implemented"})
+	c.JSON(http.StatusOK, gin.H{"message": "User stored", "data": toAPIUser(user)})
 }
 
 func UserDelete(c *gin.Context) {
@@ -80,7 +106,7 @@ func SourcePost(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Source stored"})
+	c.JSON(http.StatusOK, gin.H{"message": "Source stored", "data": data})
 }
 
 func SourceDelete(c *gin.Context) {

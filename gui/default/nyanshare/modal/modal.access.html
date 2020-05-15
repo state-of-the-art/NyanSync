@@ -15,7 +15,12 @@
     </div>
     <div class="form-group" ng-class="{ 'has-error': form.source_type.$dirty && form.source_type.$invalid }">
       <label for="access_users">User</label>
-      <tags-input ng-model="access_users" name="access_users" add-on-paste="true" min-tags="1" placeholder="Users have this access">
+      <tags-input ng-model="access_users" name="access_users" placeholder="Users have this access"
+          add-on-paste="true"
+          min-tags="1"
+          on-tag-adding="vm.createUser($tag)"
+          key-property="Login"
+          display-property="Name">
         <auto-complete source="vm.loadUsers($query)" min-length="0" load-on-focus="true" load-on-empty="true" max-results-to-show="32"></auto-complete>
       </tags-input>
       <span ng-show="form.access_users.$dirty && form.access_users.$error.valid" class="help-block">At least one user is required</span>
@@ -32,7 +37,7 @@
       <span class="fas fa-times"></span>&nbsp;<span translate>Cancel</span>
     </button>
     <span class="tooltip-wrapper pull-left" title="{{ form.$dirty ? 'Remove not available for changed item' : '' }}">
-      <button type="button" class="btn btn-warning" ng-click="vm.remove()" ng-if="source._orig_id" ng-disabled="form.$dirty">
+      <button type="button" class="btn btn-warning" ng-click="vm.remove()" ng-if="access.Id" ng-disabled="form.$dirty">
         <span class="fas fa-minus-circle"></span>&nbsp;<span translate>Remove</span>
       </button>
     </span>

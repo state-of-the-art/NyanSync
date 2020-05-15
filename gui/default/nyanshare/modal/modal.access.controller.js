@@ -27,9 +27,7 @@
         })();
 
         vm.submit = function() {
-          if( !$scope.source._orig_id )
-            $scope.source._orig_id = $scope.source.Id
-          $scope.source.$save().then(function(){
+          $scope.access.$save().then(function(){
             $uibModalInstance.close();
           });
         };
@@ -48,11 +46,13 @@
             controllerAs: 'vm',
             size: 'sm',
             resolve: {
-              body: function(){ return 'Are you sure you want to remove source with name "' + source.Id + '"?'; },
+              body: function(){
+                return 'Are you sure you want to remove access "' + $scope.access.Id + '"?';
+              },
             },
           }).result.then(function( result ) {
             if( result === true ) {
-              $scope.source.$remove().then(function(){
+              $scope.access.$remove().then(function(){
                 $uibModalInstance.close();
               });
             }
@@ -62,6 +62,28 @@
         vm.loadUsers = function(query) {
           console.log(query);
           return UserService.query().$promise;
+        };
+        vm.createUser = function(data) {
+          var promise = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'nyanshare/modal/modal.user.html',
+            controller: 'UserController',
+            controllerAs: 'vm',
+            size: 'md',
+            resolve: {
+              user: function(){ return data; },
+            },
+          }).result.then(function( result ) {
+            console.log('asd', result);
+            UserService.query({cache: false});
+            if( result instanceof UserService ) {
+              data.Login = result.Login
+              data.Name = result.Name
+            }
+          });
+          return promise;
         };
       }
     ])

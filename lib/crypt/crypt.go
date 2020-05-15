@@ -73,3 +73,7 @@ func Generate(password string, salt []byte) (hash Hash) {
 func (hash *Hash) IsEqual(password string) bool {
 	return bytes.Compare(hash.Data, Generate(password, hash.Salt).Data) == 0
 }
+
+func (hash *Hash) IsEmpty() bool {
+	return hash.Algo == ""
+}
