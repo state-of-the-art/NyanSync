@@ -72,8 +72,13 @@
             size: 'lg',
             resolve: {
               title: function(){ return 'Create new share'; },
-              source_id: function(){ return vm.navigator_path[0]; },
-              path: function(){ return vm.navigator_path.slice(1).concat(item.Name).join('/'); },
+              source_id: function(){ return vm.navigator_path[0] || item.Name; },
+              path: function(){
+                if( vm.navigator_path.length == 0 )
+                  return '';
+                else
+                  return vm.navigator_path.slice(1).concat(item.Name).join('/');
+              },
               item: function(){ return item; },
             },
           }).result.then(function() {

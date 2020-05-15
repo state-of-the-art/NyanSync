@@ -9,10 +9,9 @@
       <span ng-show="form.source_id.$dirty && form.source_id.$error.required" class="help-block">Source Name is required</span>
       <span ng-show="form.source_id.$dirty && form.source_id.$error.sourceid" class="help-block">Specified source not found</span>
     </div>
-    <div class="form-group" ng-class="{ 'has-error': form.access_path.$dirty && form.access_path.$invalid }">
+    <div class="form-group">
       <label for="access_path">Path</label>
-      <input type="text" ng-model="access.Path" name="access_path" class="form-control" placeholder="Access path to the required resource" required />
-      <span ng-show="form.access_path.$dirty && form.access_path.$error.required" class="help-block">Path is required</span>
+      <input type="text" ng-model="access.Path" name="access_path" class="form-control" placeholder="Optional path restriction for source" />
     </div>
     <div class="form-group" ng-class="{ 'has-error': form.source_type.$dirty && form.source_type.$invalid }">
       <label for="access_users">User</label>
