@@ -46,6 +46,19 @@ func (u *User) Set(password string, name string, init bool) {
 	u.Init = init
 }
 
+func (u *User) Remove() {
+	state.Lock()
+	defer state.Unlock()
+	for i, user := range state.Users {
+		if user.Login == u.Login {
+			// Just repace current user with last one and shrink the array
+			state.Users[i] = state.Users[len(state.Users)-1]
+			state.Users = state.Users[:len(state.Users)-1]
+			return
+		}
+	}
+}
+
 func (u *User) CheckPassword(password string) bool {
 	u.RLock()
 	defer u.RUnlock()

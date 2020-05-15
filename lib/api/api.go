@@ -80,6 +80,13 @@ func InitV1(router *gin.Engine) {
 			auth.POST("/login", api_data.JWT.LoginHandler)
 			auth.GET("/refresh_token", api_data.JWT.RefreshHandler)
 		}
+		user := v1.Group("/user")
+		user.Use(api_data.JWT.MiddlewareFunc())
+		{
+			user.GET("/", UsersGetList)
+			user.POST("/:id", UserPost)
+			user.DELETE("/:id", UserDelete)
+		}
 		source := v1.Group("/source")
 		source.Use(api_data.JWT.MiddlewareFunc())
 		{

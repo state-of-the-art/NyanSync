@@ -121,8 +121,11 @@ func (s *st) Load() bool {
 	return false
 }
 
+func UsersList() []User {
+	return state.Users
+}
+
 func SourcesList() []Source {
-	// TODO: actual sources
 	out := make([]Source, 0, len(state.Sources))
 
 	for _, value := range state.Sources {

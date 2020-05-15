@@ -28,6 +28,43 @@ type NavigateItem struct {
 	Preview string
 }
 
+func UsersGetList(c *gin.Context) {
+	users := state.UsersList()
+	var out_users []User
+	for _, u := range users {
+		out_users = append(out_users, User{
+			Login: u.Login,
+			Name:  u.Name,
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Get users list", "data": out_users})
+}
+
+func UserPost(c *gin.Context) {
+	var data state.User
+	if err := c.ShouldBind(&data); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Wrong request body: %v", err)})
+		return
+	}
+	/*if err := data.SaveRename(c.Param("id")); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Unable to save user: %v", err)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User stored"})*/
+	c.JSON(http.StatusBadRequest, gin.H{"message": "Save user not implemented"})
+}
+
+func UserDelete(c *gin.Context) {
+	login := c.Param("Login")
+	if u := state.UserFind(login); u != nil {
+		u.Remove()
+		c.JSON(http.StatusOK, gin.H{"message": "User removed"})
+		return
+	}
+	c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
+}
+
 func SourcesGetList(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Get sources list", "data": state.SourcesList()})
 }
