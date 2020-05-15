@@ -18,4 +18,4 @@ reformat=$(gofmt -l .)
 go generate ./...
 
 # Build & install the binary
-go install -v .
+go install -v ./cmd/NyanShare

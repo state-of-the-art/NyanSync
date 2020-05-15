@@ -1,4 +1,4 @@
-# NyanShare
+# NyanSync
 
 Sharing platform to face your files in the web.
 
@@ -6,8 +6,8 @@ Originally based on [Syncthing](https://syncthing.net/) but could be used to sha
 through your server or redirect to original sources. Will protect your files by token, user/pass,
 tls etc.
 
-* **NyanShare** - application to share your data with anyone
 * **NyanSync** - system to sync & share your files, combining NyanShare and Syncthing
+* **NyanShare** - application to share your data with anyone
 
 *WARNING:* development still in progress.
 

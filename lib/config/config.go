@@ -55,6 +55,12 @@ func Load() {
 	if err := goconfig.Parse(cfg); err != nil {
 		log.Panic("Unable to read config file", err)
 	}
+	if cfg.Sources == nil {
+		cfg.Sources = make(map[string]Source)
+	}
+	if cfg.Receivers == nil {
+		cfg.Receivers = make(map[string]Receiver)
+	}
 
 	cfg.Save()
 }

@@ -27,9 +27,12 @@ func Init() {
 		user := UserGet(init_admin_login)
 		user.Set(admin_pass, "Administrator", true)
 
+		if err := os.MkdirAll(filepath.Dir(state.FilePathGet()), 0750); err != nil {
+			log.Panic("Unable to create dir: ", err)
+		}
 		admin_password_file := filepath.Join(filepath.Dir(state.FilePathGet()), init_admin_password_file)
 		if err := ioutil.WriteFile(admin_password_file, []byte(admin_pass), 0400); err != nil {
-			log.Panic("Unable to write admin password file", err)
+			log.Panic("Unable to write admin password file: ", err)
 		}
 	}
 
@@ -74,7 +77,7 @@ var state = &st{}
 func (s *st) SaveNow() {
 	log.Println("Saving json", s.FilePathGet())
 	if err := os.MkdirAll(filepath.Dir(s.FilePathGet()), 0750); err != nil {
-		log.Panic("Unable to create save dir", err)
+		log.Panic("Unable to create save dir: ", err)
 	}
 
 	s.RLock()
