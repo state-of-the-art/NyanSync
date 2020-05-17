@@ -45,8 +45,11 @@
             'request': function( config ) {
               // Clean cache if we need to
               if( config.cache && config.params && config.params.cache === false ) {
-                $cacheFactory.get('$http').remove(config.url);
                 delete config.params.cache;
+                if( Object.keys(config.params).length === 0 )
+                  $cacheFactory.get('$http').remove(config.url);
+                else
+                  config.cache = false;
               }
 
               // Inject auth header

@@ -36,16 +36,19 @@ func toAPIUser(user *state.User) (api_user User) {
 }
 
 func UsersGetList(c *gin.Context) {
+	query := c.Query("q")
 	users := state.UsersList()
 	var out_users []User
 	for _, u := range users {
-		out_users = append(out_users, toAPIUser(&u))
+		if strings.Contains(u.Login, query) || strings.Contains(u.Name, query) {
+			out_users = append(out_users, toAPIUser(&u))
+		}
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Get users list", "data": out_users})
 }
 
 func UserGet(c *gin.Context) {
-	login := c.Param("Login")
+	login := c.Param("login")
 	if user := state.UserFind(login); user != nil {
 		c.JSON(http.StatusOK, gin.H{"message": "Get user", "data": toAPIUser(user)})
 		return
@@ -66,6 +69,7 @@ func UserPost(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Login can't be empty"})
 		return
 	}
+	// TODO: edit logic with using c.Param("login")
 	user := state.UserGet(data.Login)
 	// Check if the password is correct to edit the user
 	if !user.PassHash.IsEmpty() && !user.CheckPassword(data.Password) {
@@ -82,7 +86,7 @@ func UserPost(c *gin.Context) {
 }
 
 func UserDelete(c *gin.Context) {
-	login := c.Param("Login")
+	login := c.Param("login")
 	if u := state.UserFind(login); u != nil {
 		u.Remove()
 		c.JSON(http.StatusOK, gin.H{"message": "User removed"})

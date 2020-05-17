@@ -18,10 +18,15 @@
       <tags-input ng-model="access_users" name="access_users" placeholder="Users have this access"
           add-on-paste="true"
           min-tags="1"
-          on-tag-adding="vm.createUser($tag)"
+          on-tag-adding="vm.checkUser($tag)"
           key-property="Login"
           display-property="Name">
-        <auto-complete source="vm.loadUsers($query)" min-length="0" load-on-focus="true" load-on-empty="true" max-results-to-show="32"></auto-complete>
+        <auto-complete source="vm.loadUsers($query)"
+          min-length="0"
+          load-on-focus="true"
+          load-on-empty="true"
+          max-results-to-show="32"
+          debounce-delay="500"></auto-complete>
       </tags-input>
       <span ng-show="form.access_users.$dirty && form.access_users.$error.valid" class="help-block">At least one user is required</span>
     </div>

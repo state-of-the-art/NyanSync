@@ -60,8 +60,22 @@
         };
 
         vm.loadUsers = function(query) {
-          console.log(query);
+          if( query )
+            return UserService.query({q: query, cache: false}).$promise;
           return UserService.query().$promise;
+        };
+        vm.checkUser = function(data) {
+          return UserService.get({Login: data.Login || data.Name}).$promise.then(function(user) {
+            // Check the user is present only once
+            for( var i = 0; i < $scope.access_users.length; i++ ) {
+              const u = $scope.access_users[i];
+              if( u.Login === user.Login )
+                return false;
+            }
+            Object.assign(data, user);
+          }, function(error) {
+            return vm.createUser(data);
+          });
         };
         vm.createUser = function(data) {
           var promise = $uibModal.open({
@@ -76,7 +90,6 @@
               user: function(){ return data; },
             },
           }).result.then(function( result ) {
-            console.log('asd', result);
             UserService.query({cache: false});
             if( result instanceof UserService ) {
               data.Login = result.Login

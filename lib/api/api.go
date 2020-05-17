@@ -84,9 +84,9 @@ func InitV1(router *gin.Engine) {
 		user.Use(api_data.JWT.MiddlewareFunc())
 		{
 			user.GET("/", UsersGetList)
-			user.GET("/:id", UserGet)
-			user.POST("/:id", UserPost)
-			user.DELETE("/:id", UserDelete)
+			user.GET("/:login", UserGet)
+			user.POST("/:login", UserPost)
+			user.DELETE("/:login", UserDelete)
 		}
 		source := v1.Group("/source")
 		source.Use(api_data.JWT.MiddlewareFunc())
