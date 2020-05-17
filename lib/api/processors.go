@@ -35,7 +35,7 @@ func toAPIUser(user *state.User) (api_user User) {
 	return
 }
 
-func UsersGetList(c *gin.Context) {
+func UserGetList(c *gin.Context) {
 	query := c.Query("q")
 	users := state.UsersList()
 	var out_users []User
@@ -95,8 +95,61 @@ func UserDelete(c *gin.Context) {
 	c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
 }
 
-func SourcesGetList(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Get sources list", "data": state.SourcesList()})
+func AccessGetList(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"message": "Get access list", "data": state.AccessList()})
+}
+
+func AccessGet(c *gin.Context) {
+	id := c.Param("id")
+	if state.AccessExists(id) {
+		c.JSON(http.StatusOK, gin.H{"message": "Get access", "data": state.AccessGet(id)})
+		return
+	}
+	c.JSON(http.StatusNotFound, gin.H{"message": "Access not found"})
+}
+
+func AccessPost(c *gin.Context) {
+	var data state.Access
+	if err := c.ShouldBind(&data); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Wrong request body: %v", err)})
+		return
+	}
+	if c.Param("id") == "/" {
+		// Create new access
+		data.NewId()
+	} else if c.Param("id") != data.Id {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Unable to change the access ID"})
+		return
+	}
+	if err := data.Save(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Unable to save access: %v", err)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Access stored", "data": data})
+}
+
+func AccessDelete(c *gin.Context) {
+	id := c.Param("id")
+	if !state.AccessExists(id) {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Access not found"})
+		return
+	}
+	state.AccessRemove(id)
+	c.JSON(http.StatusOK, gin.H{"message": "Access removed"})
+}
+
+func SourceGetList(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"message": "Get sources list", "data": state.SourceList()})
+}
+
+func SourceGet(c *gin.Context) {
+	id := c.Param("id")
+	if state.SourceExists(id) {
+		c.JSON(http.StatusOK, gin.H{"message": "Get source", "data": state.SourceGet(id)})
+		return
+	}
+	c.JSON(http.StatusNotFound, gin.H{"message": "Source not found"})
 }
 
 func SourcePost(c *gin.Context) {
@@ -128,7 +181,7 @@ func NavigateGetList(c *gin.Context) {
 	p := c.Param("path")[1:]
 	var out []NavigateItem
 	if len(p) == 0 {
-		for _, v := range state.SourcesList() {
+		for _, v := range state.SourceList() {
 			out = append(out, NavigateItem{
 				FileSystemItem: processors.FileSystemItem{
 					Name: v.Id,

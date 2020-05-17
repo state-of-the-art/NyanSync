@@ -36,10 +36,6 @@ func Init() {
 		}
 	}
 
-	if state.Sources == nil {
-		state.Sources = make(map[string]Source)
-	}
-
 	SourcesUpdateFromConfig()
 }
 
@@ -69,66 +65,136 @@ type st struct {
 
 	Users   []User
 	Sources map[string]Source
+	state_w bool
+
+	Access   map[string]Access `json:"-"` // Stored to another file
+	access_w bool
 }
 
 // Current application state
 var state = &st{}
 
 func (s *st) SaveNow() {
-	log.Println("Saving json", s.FilePathGet())
-	if err := os.MkdirAll(filepath.Dir(s.FilePathGet()), 0750); err != nil {
+	if s.state_w {
+		s.RLock()
+		saveJson(s, s.FilePathGet())
+		s.RUnlock()
+
+		s.Lock()
+		s.state_w = false
+		s.Unlock()
+	}
+	if s.access_w {
+		s.RLock()
+		saveJson(s.Access, location.RealFilePath(config.Cfg().AccessFilePath))
+		s.RUnlock()
+
+		s.Lock()
+		s.access_w = false
+		s.Unlock()
+	}
+}
+
+func saveJson(s interface{}, path string) {
+	log.Println("Saving json", path)
+	if err := os.MkdirAll(filepath.Dir(path), 0750); err != nil {
 		log.Panic("Unable to create save dir: ", err)
 	}
 
-	s.RLock()
-	defer s.RUnlock()
-
 	data, err := json.Marshal(s)
 	if err != nil {
-		log.Panic("Error during serializing of the base config struct", err)
+		log.Panic("Error during serializing for the file ", path, ": ", err)
 	}
 
-	if err := ioutil.WriteFile(s.FilePathGet(), data, 0640); err != nil {
-		log.Panic("Error during write base config to file", err)
+	if err := ioutil.WriteFile(path, data, 0640); err != nil {
+		log.Panic("Error during write to file ", path, ": ", err)
 	}
 }
 
 func (s *st) Save() {
+	go s.save(&s.state_w)
+}
+
+func (s *st) SaveAccess() {
+	go s.save(&s.access_w)
+}
+
+func (s *st) save(flag *bool) {
+	s.Lock()
+	*flag = true
+	defer s.Unlock()
 	if !s.SaveLock() {
 		return
 	}
 
 	go func() {
+		defer s.SaveUnlock()
 		// Wait for 5 seconds and save the config
 		time.Sleep(5 * time.Second)
-		defer s.SaveUnlock()
 		s.SaveNow()
 	}()
 }
 
 func (s *st) Load() bool {
-	log.Println("[DEBUG] Loading from file", s.FilePathGet())
+	var ok = s.loadState()
+	s.loadAccess()
+
+	if state.Sources == nil {
+		state.Sources = make(map[string]Source)
+	}
+	if state.Access == nil {
+		state.Access = make(map[string]Access)
+	}
+
+	return ok
+}
+
+func (s *st) loadState() bool {
+	log.Println("[DEBUG] Loading state from file", s.FilePathGet())
 	if file, err := os.OpenFile(s.FilePathGet(), os.O_RDONLY, 640); err == nil {
 		defer file.Close()
 		decoder := json.NewDecoder(file)
 		s.Lock()
 		defer s.Unlock()
 		if err = decoder.Decode(s); err != nil {
-			log.Panic("Unable to decode loaded file", err)
+			log.Panic("Unable to decode loaded file: ", err)
 		}
 		return true
 	}
 	return false
 }
 
+func (s *st) loadAccess() {
+	path := location.RealFilePath(config.Cfg().AccessFilePath)
+	log.Println("[DEBUG] Loading access from file", path)
+	if file, err := os.OpenFile(path, os.O_RDONLY, 640); err == nil {
+		defer file.Close()
+		decoder := json.NewDecoder(file)
+		s.Lock()
+		defer s.Unlock()
+		if err = decoder.Decode(s.Access); err != nil {
+			log.Panic("Unable to decode loaded file: ", err)
+		}
+	}
+}
+
 func UsersList() []User {
 	return state.Users
 }
 
-func SourcesList() []Source {
+func SourceList() []Source {
 	out := make([]Source, 0, len(state.Sources))
 
 	for _, value := range state.Sources {
+		out = append(out, value)
+	}
+	return out
+}
+
+func AccessList() []Access {
+	out := make([]Access, 0, len(state.Access))
+
+	for _, value := range state.Access {
 		out = append(out, value)
 	}
 	return out

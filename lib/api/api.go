@@ -36,7 +36,7 @@ func initAuthV1() {
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			log.Println("[DEBUG]: Authenitcator")
+			log.Println("[DEBUG]: Authenticator")
 			var data jwt_authenticate_body
 			if c.ShouldBind(&data) != nil {
 				return "", jwt.ErrMissingLoginValues
@@ -46,6 +46,7 @@ func initAuthV1() {
 			if user == nil || !user.CheckPassword(data.Password) {
 				return nil, jwt.ErrFailedAuthentication
 			}
+			log.Println("[DEBUG]: Authenticator2")
 
 			return &User{
 				Login: user.Login,
@@ -83,15 +84,24 @@ func InitV1(router *gin.Engine) {
 		user := v1.Group("/user")
 		user.Use(api_data.JWT.MiddlewareFunc())
 		{
-			user.GET("/", UsersGetList)
+			user.GET("/", UserGetList)
 			user.GET("/:login", UserGet)
 			user.POST("/:login", UserPost)
 			user.DELETE("/:login", UserDelete)
 		}
+		access := v1.Group("/access")
+		access.Use(api_data.JWT.MiddlewareFunc())
+		{
+			access.GET("/", AccessGetList)
+			access.GET("/:id", AccessGet)
+			access.POST("/*id", AccessPost)
+			access.DELETE("/:id", AccessDelete)
+		}
 		source := v1.Group("/source")
 		source.Use(api_data.JWT.MiddlewareFunc())
 		{
-			source.GET("/", SourcesGetList)
+			source.GET("/", SourceGetList)
+			source.GET("/:id", SourceGet)
 			source.POST("/:id", SourcePost)
 			source.DELETE("/:id", SourceDelete)
 		}

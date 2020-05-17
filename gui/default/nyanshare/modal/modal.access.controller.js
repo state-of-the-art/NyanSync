@@ -27,6 +27,10 @@
         })();
 
         vm.submit = function() {
+          // Add list of user logins to access object
+          $scope.access.Users = [];
+          for( const u of $scope.access_users )
+            $scope.access.Users.push(u.Login);
           $scope.access.$save().then(function(){
             $uibModalInstance.close();
           });
@@ -67,8 +71,7 @@
         vm.checkUser = function(data) {
           return UserService.get({Login: data.Login || data.Name}).$promise.then(function(user) {
             // Check the user is present only once
-            for( var i = 0; i < $scope.access_users.length; i++ ) {
-              const u = $scope.access_users[i];
+            for( const u of $scope.access_users ) {
               if( u.Login === user.Login )
                 return false;
             }
