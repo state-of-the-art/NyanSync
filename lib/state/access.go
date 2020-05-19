@@ -8,7 +8,9 @@ import (
 )
 
 const (
-	InvalidAccessSourceId = "Invalid access Source Id"
+	InvalidAccessSourceId  = "Invalid access Source Id"
+	InvalidAccessUserLogin = "Invalid access User Login"
+	InvalidAccessManager   = "Invalid access Manager"
 )
 
 type Access struct {
@@ -16,6 +18,7 @@ type Access struct {
 
 	Id       string
 	SourceId string
+	Manager  string
 	Path     string
 	Users    []string
 }
@@ -41,8 +44,9 @@ func AccessRemove(id string) {
 	state.SaveAccess()
 }
 
-func (a *Access) Set(source_id string, path string, users []string) {
+func (a *Access) Set(source_id string, manager string, path string, users []string) {
 	a.SourceId = source_id
+	a.Manager = manager
 	a.Path = path
 	a.Users = users
 	a.Save()
@@ -60,12 +64,24 @@ func (a *Access) Save() error {
 }
 
 func (a *Access) IsValid() error {
-	if SourceExists(a.SourceId) {
-		return nil
+	if !SourceExists(a.SourceId) {
+		return errors.New(InvalidAccessSourceId)
 	}
-	return errors.New(InvalidAccessSourceId)
+	for _, u := range a.Users {
+		if UserFind(u) == nil {
+			return errors.New(InvalidAccessUserLogin)
+		}
+	}
+	if a.Manager != "" && UserFind(a.Manager) == nil {
+		return errors.New(InvalidAccessManager)
+	}
+	return nil
 }
 
 func (a *Access) NewId() {
 	a.Id = shortuuid.New()
+	// Rarely the generated uuid could be already here - so need to check
+	if _, exists := state.Access[a.Id]; exists {
+		a.NewId()
+	}
 }

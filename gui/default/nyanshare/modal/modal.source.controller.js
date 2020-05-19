@@ -3,16 +3,25 @@
 
   angular
     .module('app')
-    .controller('SourceController', ['title', 'source', '$scope', 'SourceService', '$uibModalInstance', '$uibModal',
-      function( title, source, $scope, SourceService, $uibModalInstance, $uibModal ) {
+    .controller('SourceController', ['source', '$scope', '$uibModalInstance', '$uibModal', 'SourceService', 'AuthService',
+      function( source, $scope, $uibModalInstance, $uibModal, SourceService, AuthService ) {
         var vm = this;
 
-        vm.title = title;
+        if( source && source.Id )
+          vm.title = 'Edit source "' + source.Id + '"';
+        else
+          vm.title = 'Create new source';
 
         (function initController() {
           // Source to create or edit
-          $scope.source = source ? source : new SourceService();
+          $scope.source = source instanceof SourceService ? source : new SourceService(source);
+          // Set original id for renaming
           $scope.source._orig_id = $scope.source.Id
+
+          // Check manager is set - and if not - set the current user
+          if( $scope.source.Manager === undefined ) {
+            $scope.source.Manager = AuthService.GetTokenClaims().id;
+          }
 
           // To validate the used source ids
           SourceService.query().$promise.then(function(sources){

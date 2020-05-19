@@ -10,16 +10,18 @@ import (
 )
 
 const (
-	InvalidSourceId   = "Invalid source Id"
-	InvalidSourceUri  = "Invalid source URI"
-	InvalidSourceType = "Invalid source Type"
+	InvalidSourceId      = "Invalid source Id"
+	InvalidSourceUri     = "Invalid source URI"
+	InvalidSourceType    = "Invalid source Type"
+	InvalidSourceManager = "Invalid source Manager"
 )
 
 type Source struct {
 	*config.Source
 	sync.RWMutex
 
-	Id string
+	Id      string
+	Manager string
 }
 
 func SourceExists(id string) bool {
@@ -33,7 +35,7 @@ func SourceGet(id string) Source {
 	if _, ok := state.Sources[id]; ok {
 		return state.Sources[id]
 	}
-	return Source{&config.Source{}, sync.RWMutex{}, id}
+	return Source{&config.Source{}, sync.RWMutex{}, id, ""}
 }
 
 func SourceRemove(id string) {
@@ -43,7 +45,8 @@ func SourceRemove(id string) {
 	state.Save()
 }
 
-func (s *Source) Set(uri string, _type string /* TODO: Options */) {
+func (s *Source) Set(manager string, uri string, _type string /* TODO: Options */) {
+	s.Manager = manager
 	s.Uri = uri
 	s.Type = _type
 	s.Save()
@@ -88,6 +91,9 @@ func (s *Source) IsValid() error {
 	}
 	if s.Type == "" {
 		return errors.New(InvalidSourceType)
+	}
+	if s.Manager != "" && UserFind(s.Manager) == nil {
+		return errors.New(InvalidSourceManager)
 	}
 
 	return nil

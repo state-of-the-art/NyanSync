@@ -21,6 +21,7 @@ type jwt_authenticate_body struct {
 type User struct {
 	Login    string
 	Name     string
+	Manager  string
 	Password string `json:"-"` // ignore on marshalling
 }
 
@@ -32,6 +33,7 @@ type NavigateItem struct {
 func toAPIUser(user *state.User) (api_user User) {
 	api_user.Login = user.Login
 	api_user.Name = user.Name
+	api_user.Manager = user.Manager
 	return
 }
 
@@ -70,17 +72,25 @@ func UserPost(c *gin.Context) {
 		return
 	}
 	// TODO: edit logic with using c.Param("login")
+	// TODO: change manager in all resources during renaming of the user
 	user := state.UserGet(data.Login)
 	// Check if the password is correct to edit the user
 	if !user.PassHash.IsEmpty() && !user.CheckPassword(data.Password) {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Wrong password to edit user"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Wrong password to modify user"})
 		return
 	}
 	// Remove init flag when user saved twice
 	if !user.PassHash.IsEmpty() {
 		user.Init = false
 	}
-	user.Set(data.Password, data.Name, user.Init)
+	if err := user.Set(data.Password, data.Name, data.Manager, user.Init); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Wrong user data: %v", err)})
+		if user.PassHash.IsEmpty() {
+			// Remove the new invalid user
+			user.Remove()
+		}
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "User stored", "data": toAPIUser(user)})
 }

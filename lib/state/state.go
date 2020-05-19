@@ -25,7 +25,7 @@ func Init() {
 		// Create admin password, user and store password as admin file
 		admin_pass := crypt.RandString(32)
 		user := UserGet(init_admin_login)
-		user.Set(admin_pass, "Administrator", true)
+		user.Set(admin_pass, "Administrator", "", true)
 
 		if err := os.MkdirAll(filepath.Dir(state.FilePathGet()), 0750); err != nil {
 			log.Panic("Unable to create dir: ", err)
@@ -44,7 +44,7 @@ func SourcesUpdateFromConfig() {
 	// Update the state sources according the config
 	for id := range cfg_sources {
 		s := SourceGet(id)
-		s.Set(cfg_sources[id].Uri, cfg_sources[id].Type)
+		s.Set(s.Manager, cfg_sources[id].Uri, cfg_sources[id].Type)
 	}
 
 	// Removing not existing sources from state
@@ -172,7 +172,7 @@ func (s *st) loadAccess() {
 		decoder := json.NewDecoder(file)
 		s.Lock()
 		defer s.Unlock()
-		if err = decoder.Decode(s.Access); err != nil {
+		if err = decoder.Decode(&s.Access); err != nil {
 			log.Panic("Unable to decode loaded file: ", err)
 		}
 	}

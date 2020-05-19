@@ -3,17 +3,23 @@
 
   angular
     .module('app')
-    .controller('AccessController', ['title', 'source_id', 'path', 'item', '$scope', '$uibModalInstance', '$uibModal', 'AccessService', 'UserService', 'SourceService',
-      function( title, source_id, path, item, $scope, $uibModalInstance, $uibModal, AccessService, UserService, SourceService ) {
+    .controller('AccessController', ['access', '$scope', '$uibModalInstance', '$uibModal', 'AccessService', 'UserService', 'SourceService', 'AuthService',
+      function( access, $scope, $uibModalInstance, $uibModal, AccessService, UserService, SourceService, AuthService ) {
         var vm = this;
 
-        vm.title = title;
+        if( access && access.Id )
+          vm.title = 'Edit access "' + access.Id + '"';
+        else
+          vm.title = 'Create new access';
 
         (function initController() {
           // Access to create or edit
-          $scope.access = new AccessService();
-          $scope.access.SourceId = source_id;
-          $scope.access.Path = path;
+          $scope.access = access instanceof AccessService ? access : new AccessService(access);
+
+          // Check manager is set - and if not - set the current user
+          if( $scope.access.Manager === undefined ) {
+            $scope.access.Manager = AuthService.GetTokenClaims().id;
+          }
 
           $scope.access_users = [];
           if( $scope.access.Users !== null ) {

@@ -3,8 +3,8 @@
 
   angular
     .module('app')
-    .controller('UserController', ['user', '$scope', 'UserService', '$uibModalInstance', '$uibModal',
-      function( user, $scope, UserService, $uibModalInstance, $uibModal ) {
+    .controller('UserController', ['user', '$scope', '$uibModalInstance', '$uibModal', 'UserService', 'AuthService',
+      function( user, $scope, $uibModalInstance, $uibModal, UserService, AuthService ) {
         var vm = this;
 
         if( user && user.Login )
@@ -15,9 +15,16 @@
         (function initController() {
           // User to create or edit
           $scope.user = user instanceof UserService ? user : new UserService(user);
+
+          // Set original id for renaming
           $scope.user._orig_login = $scope.user.Login;
           if( !$scope.user._orig_login )
             $scope.user.Login = $scope.user.Name;
+
+          // Check manager is set - and if not - set the current user
+          if( $scope.user.Manager === undefined ) {
+            $scope.user.Manager = AuthService.GetTokenClaims().id;
+          }
 
           // To validate the used user logins
           UserService.query().$promise.then(function(users){

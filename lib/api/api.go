@@ -55,7 +55,7 @@ func initAuthV1() {
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {
 			log.Println("[DEBUG]: Authorizator", data.(*User))
-			// TODO: check the func
+			// TODO: check the policies of the user
 			if v, ok := data.(*User); ok && v.Login == "admin" {
 				return true
 			}

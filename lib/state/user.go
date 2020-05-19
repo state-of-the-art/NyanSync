@@ -3,14 +3,21 @@ package state
 import (
 	"sync"
 
+	"github.com/pkg/errors"
+
 	"github.com/state-of-the-art/NyanSync/lib/crypt"
+)
+
+const (
+	InvalidUserManager = "Invalid user Manager"
 )
 
 type User struct {
 	sync.RWMutex
 
-	Login    string     // Login id of the user
-	Name     string     // Real name of the user
+	Login    string // Login id of the user
+	Name     string // Real name of the user
+	Manager  string
 	Init     bool       // First time created user - should be recreated
 	PassHash crypt.Hash // Hash + salt for the user password
 }
@@ -38,13 +45,19 @@ func UserGet(login string) *User {
 	return puser
 }
 
-func (u *User) Set(password string, name string, init bool) {
+func (u *User) Set(password string, name string, manager string, init bool) error {
+	if manager != "" && UserFind(manager) == nil {
+		return errors.New(InvalidUserManager)
+	}
 	u.Lock()
 	defer u.Unlock()
 	u.Name = name
+	u.Manager = manager
 	u.PassHash = crypt.Generate(password, nil)
 	u.Init = init
 	state.Save()
+
+	return nil
 }
 
 func (u *User) Remove() {

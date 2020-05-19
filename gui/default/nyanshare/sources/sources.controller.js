@@ -28,7 +28,6 @@
             controllerAs: 'vm',
             size: 'lg',
             resolve: {
-              title: function(){ return 'Add new source'; },
               source: null,
             },
           }).result.then(function() {
@@ -46,8 +45,7 @@
             controllerAs: 'vm',
             size: 'lg',
             resolve: {
-              title: function(){ return 'Edit source'; },
-              source: function(){ return source; },
+              source: function(){ return new SourceService(source); },
             },
           }).result.then(function() {
             // TODO: update cache when URI was changed
