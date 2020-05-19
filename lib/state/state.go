@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/euroteltr/rbac"
+
 	"github.com/state-of-the-art/NyanSync/lib/config"
 	"github.com/state-of-the-art/NyanSync/lib/crypt"
 	"github.com/state-of-the-art/NyanSync/lib/location"
@@ -69,6 +71,9 @@ type st struct {
 
 	Access   map[string]Access `json:"-"` // Stored to another file
 	access_w bool
+
+	RBAC   *rbac.RBAC `json:"-"` // Stored to another file
+	rbac_w bool
 }
 
 // Current application state
@@ -91,6 +96,15 @@ func (s *st) SaveNow() {
 
 		s.Lock()
 		s.access_w = false
+		s.Unlock()
+	}
+	if s.rbac_w {
+		s.RLock()
+		saveJson(s.RBAC, location.RealFilePath(config.Cfg().RBACFilePath))
+		s.RUnlock()
+
+		s.Lock()
+		s.rbac_w = false
 		s.Unlock()
 	}
 }
@@ -119,10 +133,15 @@ func (s *st) SaveAccess() {
 	go s.save(&s.access_w)
 }
 
+func (s *st) SaveRBAC() {
+	go s.save(&s.rbac_w)
+}
+
 func (s *st) save(flag *bool) {
 	s.Lock()
-	*flag = true
 	defer s.Unlock()
+	*flag = true
+
 	if !s.SaveLock() {
 		return
 	}
@@ -138,6 +157,7 @@ func (s *st) save(flag *bool) {
 func (s *st) Load() bool {
 	var ok = s.loadState()
 	s.loadAccess()
+	s.loadRBAC()
 
 	if state.Sources == nil {
 		state.Sources = make(map[string]Source)
@@ -175,6 +195,33 @@ func (s *st) loadAccess() {
 		if err = decoder.Decode(&s.Access); err != nil {
 			log.Panic("Unable to decode loaded file: ", err)
 		}
+	}
+}
+
+func (s *st) loadRBAC() {
+	s.RBAC = rbac.New(rbac.NewConsoleLogger())
+	path := location.RealFilePath(config.Cfg().RBACFilePath)
+	log.Println("[DEBUG] Loading rbac from file", path)
+	if file, err := os.OpenFile(path, os.O_RDONLY, 640); err == nil {
+		defer file.Close()
+		if err = s.RBAC.LoadJSON(file); err != nil {
+			log.Panic("Unable to load rbac file: ", err)
+		}
+	} else {
+		// Init default RBAC rules
+		user, _ := state.RBAC.RegisterPermission("user", "User resource", rbac.Create, rbac.Read, rbac.Update, rbac.Delete)
+		access, _ := state.RBAC.RegisterPermission("access", "Access resource", rbac.Create, rbac.Read, rbac.Update, rbac.Delete)
+		source, _ := state.RBAC.RegisterPermission("source", "Source resource", rbac.Create, rbac.Read, rbac.Update, rbac.Delete)
+
+		ApproveAction := rbac.Action("approve")
+
+		admin, _ := state.RBAC.RegisterRole("admin", "Admin role")
+
+		state.RBAC.Permit(admin.ID, user, rbac.CRUD, ApproveAction)
+		state.RBAC.Permit(admin.ID, access, rbac.CRUD, ApproveAction)
+		state.RBAC.Permit(admin.ID, source, rbac.CRUD, ApproveAction)
+
+		state.SaveRBAC()
 	}
 }
 

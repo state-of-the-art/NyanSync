@@ -15,9 +15,10 @@ const (
 type User struct {
 	sync.RWMutex
 
-	Login    string // Login id of the user
-	Name     string // Real name of the user
-	Manager  string
+	Login    string     // Login id of the user
+	Name     string     // Real name of the user
+	Manager  string     // Controlling manager
+	Role     string     // Name of the role
 	Init     bool       // First time created user - should be recreated
 	PassHash crypt.Hash // Hash + salt for the user password
 }

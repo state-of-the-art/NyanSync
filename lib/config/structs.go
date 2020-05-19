@@ -13,6 +13,7 @@ type Config struct {
 	Receivers       map[string]Receiver // List of receivers to trigger playback
 	StateFilePath   string              `cfgDefault:"nyanshare_state.json"`   // If relative - config dir path
 	AccessFilePath  string              `cfgDefault:"nyanshare_access.json"`  // If relative - config dir path
+	RBACFilePath    string              `cfgDefault:"nyanshare_rbac.json"`    // If relative - config dir path
 	CatalogFilePath string              `cfgDefault:"nyanshare_catalog.json"` // If relative - config dir path
 
 	// Used to override the gui path, if set to empty - using embedded gui resources
