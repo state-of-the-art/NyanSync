@@ -18,7 +18,7 @@
         var ul = html.children('.dropdown-menu');
 
         for( var a in actions ) {
-          var a_el = $('<a/>').click(actions[a]).text(a);
+          var a_el = $('<a href=""/>').click(actions[a]).text(a);
           var li = $('<li/>').append(a_el);
           ul.append(li);
         }

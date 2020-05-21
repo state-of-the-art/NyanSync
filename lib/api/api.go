@@ -2,6 +2,7 @@ package api
 
 import (
 	"log"
+	"net/http"
 	"time"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
@@ -10,8 +11,14 @@ import (
 	"github.com/state-of-the-art/NyanSync/lib/state"
 )
 
+type jwt_authenticate_body struct {
+	Login    string `json:"login" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
 func initAuthV1() {
 	identity_key := "id"
+	var login_data jwt_authenticate_body
 
 	mw, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "nyanshare jwt",
@@ -37,16 +44,14 @@ func initAuthV1() {
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
 			log.Println("[DEBUG]: Authenticator")
-			var data jwt_authenticate_body
-			if c.ShouldBind(&data) != nil {
+			if c.ShouldBind(&login_data) != nil {
 				return "", jwt.ErrMissingLoginValues
 			}
 
-			user := state.UserFind(data.Login)
-			if user == nil || !user.CheckPassword(data.Password) {
+			user := state.UserFind(login_data.Login)
+			if user == nil || !user.CheckPassword(login_data.Password) {
 				return nil, jwt.ErrFailedAuthentication
 			}
-			log.Println("[DEBUG]: Authenticator2")
 
 			return &User{
 				Login: user.Login,
@@ -61,6 +66,16 @@ func initAuthV1() {
 			}
 
 			return false
+		},
+		LoginResponse: func(c *gin.Context, code int, token string, expire time.Time) {
+			// Getting the user, stored during login Authenticate
+			user := state.UserFind(login_data.Login)
+			c.JSON(http.StatusOK, gin.H{
+				"code":   http.StatusOK,
+				"token":  token,
+				"expire": expire.Format(time.RFC3339),
+				"user":   toAPIUser(user),
+			})
 		},
 	})
 
@@ -79,6 +94,8 @@ func InitV1(router *gin.Engine) {
 		auth := v1.Group("/auth")
 		{
 			auth.POST("/login", api_data.JWT.LoginHandler)
+			// TODO: Make sure the token can't be used anymore
+			auth.POST("/logout", api_data.JWT.LogoutHandler)
 			auth.GET("/refresh_token", api_data.JWT.RefreshHandler)
 		}
 		user := v1.Group("/user")

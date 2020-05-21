@@ -54,8 +54,8 @@
 
               // Inject auth header
               config.headers = config.headers || {};
-              if( $localStorage.token && config.url.startsWith('/api') ) {
-                config.headers.Authorization = 'Bearer ' + $localStorage.token;
+              if( $localStorage.account && config.url.startsWith('/api') ) {
+                config.headers.Authorization = 'Bearer ' + $localStorage.account.token;
               }
               return config;
             },
@@ -70,7 +70,7 @@
             'responseError': function( res ) {
               $injector.get('Notification').error('API: ' + res.data.message);
               if( res.status === 401 || res.status === 403 ) {
-                delete $localStorage.token;
+                delete $localStorage.account;
                 $location.path('/login');
               }
               return $q.reject(res);
@@ -81,9 +81,10 @@
       $resourceProvider.defaults.stripTrailingSlashes = false;
       $qProvider.errorOnUnhandledRejections(false);
     }])
-    .run(function($rootScope, $location, $localStorage) {
+    .run(function($rootScope, $location, $localStorage, AuthService) {
       $rootScope.$on( "$routeChangeStart", function(event, next) {
-        if( $localStorage.token == null ) {
+        AuthService.RefreshRootScope();
+        if( $rootScope.account == null ) {
           $location.path("/login");
         }
       });

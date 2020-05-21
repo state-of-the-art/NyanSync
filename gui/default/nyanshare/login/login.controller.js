@@ -13,11 +13,10 @@
         vm.login = function login() {
           vm.data_loading = true;
           AuthService.Login(vm.username, vm.password,
-            function( res ) {
-              $localStorage.token = res.data.token;
+            function() {
               vm.data_loading = false;
               $location.path('/');
-            }, function( res ) {
+            }, function() {
               vm.data_loading = false;
             }
           );

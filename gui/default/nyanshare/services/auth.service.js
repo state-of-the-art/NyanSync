@@ -2,8 +2,8 @@
   'use strict';
 
   angular.module('app')
-    .factory('AuthService', ['$http', '$localStorage', 'urls',
-      function( $http, $localStorage, urls ) {
+    .factory('AuthService', ['$http', '$rootScope', '$localStorage', '$location', 'urls',
+      function( $http, $rootScope, $localStorage, $location, urls ) {
         function urlBase64Decode(str) {
           var output = str.replace('-', '+').replace('_', '/');
           switch( output.length % 4 ) {
@@ -22,33 +22,50 @@
         }
 
         function getClaimsFromToken() {
-          var token = $localStorage.token;
-          var user = {};
-          if( typeof token !== 'undefined' ) {
+          if( $localStorage.account ) {
+            var token = $localStorage.account.token;
             var encoded = token.split('.')[1];
-            user = JSON.parse(urlBase64Decode(encoded));
+            var claims = JSON.parse(urlBase64Decode(encoded));
+            return claims;
           }
-          return user;
+          return {};
         }
 
         var tokenClaims = getClaimsFromToken();
+
+        var logout = function() {
+          $http.post(urls.BASE_API + 'auth/logout');
+          tokenClaims = {};
+          delete $localStorage.account;
+          delete $rootScope.account;
+          $location.path("/login");
+        };
+
+        var refreshRootScope = function() {
+          if( $localStorage.account ) {
+            $localStorage.account.Logout = logout;
+            $rootScope.account = $localStorage.account;
+          }
+        };
 
         return {
           Login: function( login, password, success, error ) {
             $http.post(urls.BASE_API + 'auth/login', {
               "login": login,
               "password": password,
-            }).then(success, error);
+            }).then(function(res) {
+              $localStorage.account = res.data.user;
+              $localStorage.account.token = res.data.token;
+              tokenClaims = getClaimsFromToken();
+              refreshRootScope();
+              success();
+            }, error);
           },
-          Logout: function( success, error ) {
-            $http.post(urls.BASE_API + 'auth/logout').then(success, error)
-            tokenClaims = {};
-            delete $localStorage.token;
-            success();
-          },
+          Logout: logout,
           GetTokenClaims: function() {
             return tokenClaims;
-          }
+          },
+          RefreshRootScope: refreshRootScope,
         };
       }
     ]);
