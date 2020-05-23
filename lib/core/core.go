@@ -25,6 +25,8 @@ func RunHTTPServer() {
 
 	api.InitV1(router)
 	gui.Init(config.Cfg().GuiPath, router)
+	state.LoadRBAC()
+	state.GetRBAC().Init()
 
 	log.Fatal(router.Run(config.Cfg().Endpoint.Address))
 }

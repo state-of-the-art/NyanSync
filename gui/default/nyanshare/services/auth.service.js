@@ -33,8 +33,9 @@
 
         var tokenClaims = getClaimsFromToken();
 
-        var logout = function() {
-          $http.post(urls.BASE_API + 'auth/logout');
+        var logout = function( notify_server ) {
+          if( notify_server )
+            $http.post(urls.BASE_API + 'auth/logout');
           tokenClaims = {};
           delete $localStorage.account;
           delete $rootScope.account;

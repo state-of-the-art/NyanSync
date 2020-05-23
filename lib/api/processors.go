@@ -17,7 +17,7 @@ type User struct {
 	Login    string
 	Name     string
 	Manager  string
-	Password string `json:"-"` // ignore on marshalling
+	Password string
 }
 
 type NavigateItem struct {

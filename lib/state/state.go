@@ -8,11 +8,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/euroteltr/rbac"
-
 	"github.com/state-of-the-art/NyanSync/lib/config"
 	"github.com/state-of-the-art/NyanSync/lib/crypt"
 	"github.com/state-of-the-art/NyanSync/lib/location"
+	"github.com/state-of-the-art/NyanSync/lib/rbac"
 )
 
 const (
@@ -133,8 +132,8 @@ func (s *st) SaveAccess() {
 	go s.save(&s.access_w)
 }
 
-func (s *st) SaveRBAC() {
-	go s.save(&s.rbac_w)
+func SaveRBAC() {
+	go state.save(&state.rbac_w)
 }
 
 func (s *st) save(flag *bool) {
@@ -157,7 +156,7 @@ func (s *st) save(flag *bool) {
 func (s *st) Load() bool {
 	var ok = s.loadState()
 	s.loadAccess()
-	s.loadRBAC()
+	s.RBAC = rbac.New()
 
 	if state.Sources == nil {
 		state.Sources = make(map[string]Source)
@@ -198,30 +197,14 @@ func (s *st) loadAccess() {
 	}
 }
 
-func (s *st) loadRBAC() {
-	s.RBAC = rbac.New(rbac.NewConsoleLogger())
+func LoadRBAC() {
 	path := location.RealFilePath(config.Cfg().RBACFilePath)
 	log.Println("[DEBUG] Loading rbac from file", path)
 	if file, err := os.OpenFile(path, os.O_RDONLY, 640); err == nil {
 		defer file.Close()
-		if err = s.RBAC.LoadJSON(file); err != nil {
+		if err = state.RBAC.LoadJSON(file); err != nil {
 			log.Panic("Unable to load rbac file: ", err)
 		}
-	} else {
-		// Init default RBAC rules
-		user, _ := state.RBAC.RegisterPermission("user", "User resource", rbac.Create, rbac.Read, rbac.Update, rbac.Delete)
-		access, _ := state.RBAC.RegisterPermission("access", "Access resource", rbac.Create, rbac.Read, rbac.Update, rbac.Delete)
-		source, _ := state.RBAC.RegisterPermission("source", "Source resource", rbac.Create, rbac.Read, rbac.Update, rbac.Delete)
-
-		ApproveAction := rbac.Action("approve")
-
-		admin, _ := state.RBAC.RegisterRole("admin", "Admin role")
-
-		state.RBAC.Permit(admin.ID, user, rbac.CRUD, ApproveAction)
-		state.RBAC.Permit(admin.ID, access, rbac.CRUD, ApproveAction)
-		state.RBAC.Permit(admin.ID, source, rbac.CRUD, ApproveAction)
-
-		state.SaveRBAC()
 	}
 }
 
@@ -245,4 +228,8 @@ func AccessList() []Access {
 		out = append(out, value)
 	}
 	return out
+}
+
+func GetRBAC() *rbac.RBAC {
+	return state.RBAC
 }

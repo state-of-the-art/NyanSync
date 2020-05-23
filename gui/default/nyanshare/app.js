@@ -70,8 +70,7 @@
             'responseError': function( res ) {
               $injector.get('Notification').error('API: ' + res.data.message);
               if( res.status === 401 || res.status === 403 ) {
-                delete $localStorage.account;
-                $location.path('/login');
+                $injector.get('AuthService').Logout(false);
               }
               return $q.reject(res);
             },
