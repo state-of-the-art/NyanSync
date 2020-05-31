@@ -39,8 +39,11 @@ func initAuthV1() {
 		IdentityHandler: func(c *gin.Context) interface{} {
 			log.Println("[DEBUG]: IdentityHandler")
 			claims := jwt.ExtractClaims(c)
-			user := state.UserFind(claims[identity_key].(string))
-			return &user
+			if state.UserExists(claims[identity_key].(string)) {
+				user := state.UserGet(claims[identity_key].(string))
+				return user
+			}
+			return nil
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
 			log.Println("[DEBUG]: Authenticator")
@@ -48,8 +51,8 @@ func initAuthV1() {
 				return "", jwt.ErrMissingLoginValues
 			}
 
-			user := state.UserFind(login_data.Login)
-			if user == nil || !user.CheckPassword(login_data.Password) {
+			user := state.UserGet(login_data.Login)
+			if !user.PasswordCheck(login_data.Password) {
 				return nil, jwt.ErrFailedAuthentication
 			}
 
@@ -68,12 +71,12 @@ func initAuthV1() {
 		},
 		LoginResponse: func(c *gin.Context, code int, token string, expire time.Time) {
 			// Getting the user, stored during login Authenticate
-			user := state.UserFind(login_data.Login)
+			user := state.UserGet(login_data.Login)
 			c.JSON(http.StatusOK, gin.H{
 				"code":   http.StatusOK,
 				"token":  token,
 				"expire": expire.Format(time.RFC3339),
-				"user":   toAPIUser(user),
+				"user":   toAPIUser(&user),
 			})
 		},
 	})
@@ -92,10 +95,10 @@ func InitV1(router *gin.Engine) {
 	v1.Use(
 		// Skip auth to allow unknown visitor to login
 		func(c *gin.Context) {
+			// Allow api/auth to be used without authorization
 			if strings.HasPrefix(c.FullPath(), v1.BasePath()+"/auth") {
-				// TODO: Fix issue with handler
-				log.Println("[DEBUG]: executing main handler:", c.Handler())
 				c.Handler()(c)
+				c.Abort()
 				return
 			}
 			c.Next()
@@ -148,36 +151,34 @@ func InitV1(router *gin.Engine) {
 			continue
 		}
 
-		action := rbac.Read
-		switch route.Method {
-		case "POST":
-			action = rbac.Update
-		case "DELETE":
-			action = rbac.Delete
-		}
-
-		perm_id := getPermId(route.Path)
-		if r.IsPermissionExist(perm_id, rbac.None) {
-			if _, ok := r.GetPermission(perm_id).Load(action); !ok {
-				r.GetPermission(perm_id).Store(action, nil)
-				state.SaveRBAC()
-			}
-		} else {
-			r.RegisterPermission(perm_id, "", action)
+		if rbac.PermSet(r, getPermId(route.Path), route.Method) {
+			// TODO: simplify rbac save
 			state.SaveRBAC()
 		}
+
 	}
 }
 
-func ProcessRBAC(c *gin.Context) {
+func ContextAccount(c *gin.Context) *state.User {
 	data, ok := c.Get("id")
 	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Account is not set"})
-		return
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Account is not set"})
+		log.Panic("Critical issue during getting account from context")
 	}
 	acc, ok := data.(*state.User)
-	if !ok || acc.Role == "" {
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Wrong account type in context"})
+		log.Panic("Critical issue during getting account from context")
+	}
+
+	return acc
+}
+
+func ProcessRBAC(c *gin.Context) {
+	acc := ContextAccount(c)
+	if acc.Role == "" {
 		c.JSON(http.StatusForbidden, gin.H{"message": "Account role is not set"})
+		c.Abort()
 		return
 	}
 
@@ -185,7 +186,32 @@ func ProcessRBAC(c *gin.Context) {
 	perm := r.GetPermission(getPermId(c.FullPath()))
 	if perm == nil {
 		c.JSON(http.StatusForbidden, gin.H{"message": "Unable to find RBAC permission"})
+		c.Abort()
 		return
+	}
+
+	// Check permissions
+	switch c.Request.Method {
+	case "GET":
+		if !r.IsGranted(acc.Role, perm, rbac.Read) {
+			c.JSON(http.StatusForbidden, gin.H{"message": "No read access"})
+			c.Abort()
+		}
+	case "POST":
+		if !r.IsGranted(acc.Role, perm, rbac.Update) ||
+			!r.IsGranted(acc.Role, perm, rbac.Create) ||
+			!r.IsGranted(acc.Role, perm, rbac.UpdateSelf) {
+			c.JSON(http.StatusForbidden, gin.H{"message": "No update/create access"})
+			c.Abort()
+		}
+	case "DELETE":
+		if !r.IsGranted(acc.Role, perm, rbac.Delete) {
+			c.JSON(http.StatusForbidden, gin.H{"message": "No delete access"})
+			c.Abort()
+		}
+	default:
+		c.JSON(http.StatusForbidden, gin.H{"message": "Unknown method"})
+		c.Abort()
 	}
 
 	c.Next()

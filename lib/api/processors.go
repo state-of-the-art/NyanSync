@@ -10,14 +10,17 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/state-of-the-art/NyanSync/lib/processors"
+	"github.com/state-of-the-art/NyanSync/lib/rbac"
 	"github.com/state-of-the-art/NyanSync/lib/state"
 )
 
 type User struct {
-	Login    string
-	Name     string
-	Manager  string
-	Password string
+	Login       string
+	Name        string
+	Manager     string
+	Role        string
+	Password    string
+	PasswordNew string
 }
 
 type NavigateItem struct {
@@ -46,58 +49,122 @@ func UserGetList(c *gin.Context) {
 
 func UserGet(c *gin.Context) {
 	login := c.Param("login")
-	if user := state.UserFind(login); user != nil {
-		c.JSON(http.StatusOK, gin.H{"message": "Get user", "data": toAPIUser(user)})
+	if !state.UserExists(login) {
+		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
 		return
 	}
-	c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
+	user := state.UserGet(login)
+	c.JSON(http.StatusOK, gin.H{"message": "Get user", "data": toAPIUser(&user)})
 }
 
 func UserPost(c *gin.Context) {
+	acc := ContextAccount(c)
+	r := state.GetRBAC()
+	perm := r.GetPermission(getPermId(c.FullPath()))
+
 	var data User
 	if err := c.ShouldBind(&data); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Wrong request body: %v", err)})
 		return
 	}
 
-	// TODO: IMPORTANT! make sure user have access to change this user
-
 	if data.Login == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Login can't be empty"})
 		return
 	}
-	// TODO: edit logic with using c.Param("login")
-	// TODO: change manager in all resources during renaming of the user
-	user := state.UserGet(data.Login)
-	// Check if the password is correct to edit the user
-	if !user.PassHash.IsEmpty() && !user.CheckPassword(data.Password) {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Wrong password to modify user"})
-		return
-	}
-	// Remove init flag when user saved twice
-	if !user.PassHash.IsEmpty() {
-		user.Init = false
-	}
-	if err := user.Set(data.Password, data.Name, data.Manager, user.Init); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Wrong user data: %v", err)})
-		if user.PassHash.IsEmpty() {
-			// Remove the new invalid user
-			user.Remove()
+
+	user := state.UserGet(c.Param("login"))
+	if state.UserExists(c.Param("login")) {
+		// MODIFY USER
+
+		if user.Login == acc.Login {
+			// Check access for self update
+			if !r.IsGranted(acc.Role, perm, rbac.UpdateSelf) {
+				c.JSON(http.StatusForbidden, gin.H{"message": "No update access"})
+				return
+			}
+
+			// Check if the password is correct to edit the user
+			if !user.PasswordCheck(data.Password) {
+				c.JSON(http.StatusBadRequest, gin.H{"message": "Wrong password to modify user"})
+				return
+			}
+			// Remove init flag on self-modification
+			user.Init = false
+			// Set the new password if provided
+			if data.PasswordNew != "" {
+				user.PasswordSet(data.PasswordNew)
+			}
+			user.Name = data.Name
+
+			// Rename user if login is changed
+			if user.Login != data.Login {
+				if state.UserExists(data.Login) {
+					c.JSON(http.StatusBadRequest, gin.H{"message": "User with such login already exists"})
+					return
+				}
+				old_login := user.Login
+				user.Login = data.Login
+				if err := user.IsValid(); err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Wrong user data: %v", err)})
+					return
+				}
+				state.UserRemove(old_login)
+				// TODO: Return new token for the user
+				// TODO: Change Manager on all the related resources
+			}
+		} else if user.Manager == acc.Login {
+			// Check access to update
+			if !r.IsGranted(acc.Role, perm, rbac.Update) {
+				c.JSON(http.StatusForbidden, gin.H{"message": "No update access"})
+				return
+			}
+
+			user.Manager = data.Manager
+			user.Role = data.Role
+		} else {
+			c.JSON(http.StatusForbidden, gin.H{"message": "You have no access to modify this user"})
+			return
 		}
+	} else {
+		// CREATE USER
+
+		// Check permission
+		if !r.IsGranted(acc.Role, perm, rbac.Create) {
+			c.JSON(http.StatusForbidden, gin.H{"message": "No create access"})
+			return
+		}
+
+		user := state.UserGet(c.Param("login"))
+		if data.Login != user.Login {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "Not the same login used in body and path"})
+			return
+		}
+
+		// Set params
+		user.Name = data.Name
+		user.Manager = data.Manager
+		user.Role = data.Role
+		user.PasswordSet(data.Password)
+	}
+
+	// Save the user
+	if err := user.Save(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Wrong user data: %v", err)})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User stored", "data": toAPIUser(user)})
+	c.JSON(http.StatusOK, gin.H{"message": "User stored", "data": toAPIUser(&user)})
 }
 
 func UserDelete(c *gin.Context) {
 	login := c.Param("login")
-	if u := state.UserFind(login); u != nil {
-		u.Remove()
-		c.JSON(http.StatusOK, gin.H{"message": "User removed"})
+	if !state.UserExists(login) {
+		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
 		return
 	}
-	c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
+	state.UserRemove(login)
+	c.JSON(http.StatusOK, gin.H{"message": "User removed"})
 }
 
 func AccessGetList(c *gin.Context) {
@@ -114,18 +181,30 @@ func AccessGet(c *gin.Context) {
 }
 
 func AccessPost(c *gin.Context) {
+	acc := ContextAccount(c)
+	r := state.GetRBAC()
+	perm := r.GetPermission(getPermId(c.FullPath()))
+
 	var data state.Access
 	if err := c.ShouldBind(&data); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Wrong request body: %v", err)})
 		return
 	}
 	if c.Param("id") == "/" {
-		// Create new access
+		// Check create permission
+		if !r.IsGranted(acc.Role, perm, rbac.Create) {
+			c.JSON(http.StatusForbidden, gin.H{"message": "No create access"})
+			return
+		}
 		data.NewId()
 	} else if c.Param("id") != data.Id {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Unable to change the access ID"})
 		return
+	} else if !r.IsGranted(acc.Role, perm, rbac.Update) { // Check update permission
+		c.JSON(http.StatusForbidden, gin.H{"message": "No update access"})
+		return
 	}
+
 	if err := data.Save(); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Unable to save access: %v", err)})
 		return
@@ -158,11 +237,27 @@ func SourceGet(c *gin.Context) {
 }
 
 func SourcePost(c *gin.Context) {
+	acc := ContextAccount(c)
+	r := state.GetRBAC()
+	perm := r.GetPermission(getPermId(c.FullPath()))
+
 	var data state.Source
 	if err := c.ShouldBind(&data); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Wrong request body: %v", err)})
 		return
 	}
+
+	// Check permission
+	if state.SourceExists(c.Param("id")) {
+		if !r.IsGranted(acc.Role, perm, rbac.Update) {
+			c.JSON(http.StatusForbidden, gin.H{"message": "No update access"})
+			return
+		}
+	} else if !r.IsGranted(acc.Role, perm, rbac.Create) {
+		c.JSON(http.StatusForbidden, gin.H{"message": "No create access"})
+		return
+	}
+
 	if err := data.SaveRename(c.Param("id")); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Unable to save source: %v", err)})
 		return

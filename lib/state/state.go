@@ -26,7 +26,11 @@ func Init() {
 		// Create admin password, user and store password as admin file
 		admin_pass := crypt.RandString(32)
 		user := UserGet(init_admin_login)
-		user.Set(admin_pass, "Administrator", "", true)
+		user.PasswordSet(admin_pass)
+		user.Role = "admin"
+		user.Name = "Administrator"
+		user.Manager = "" // Noone manages admin
+		user.Save()
 
 		if err := os.MkdirAll(filepath.Dir(state.FilePathGet()), 0750); err != nil {
 			log.Panic("Unable to create dir: ", err)
@@ -64,7 +68,7 @@ func SourcesUpdateFromConfig() {
 type st struct {
 	config.Base
 
-	Users   []User
+	Users   map[string]User
 	Sources map[string]Source
 	state_w bool
 
@@ -158,6 +162,9 @@ func (s *st) Load() bool {
 	s.loadAccess()
 	s.RBAC = rbac.New()
 
+	if state.Users == nil {
+		state.Users = make(map[string]User)
+	}
 	if state.Sources == nil {
 		state.Sources = make(map[string]Source)
 	}
@@ -209,7 +216,12 @@ func LoadRBAC() {
 }
 
 func UsersList() []User {
-	return state.Users
+	out := make([]User, 0, len(state.Users))
+
+	for _, value := range state.Users {
+		out = append(out, value)
+	}
+	return out
 }
 
 func SourceList() []Source {

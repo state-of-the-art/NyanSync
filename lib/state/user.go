@@ -18,64 +18,74 @@ type User struct {
 	Login    string     // Login id of the user
 	Name     string     // Real name of the user
 	Manager  string     // Controlling manager
-	Role     string     // Name of the role
+	Role     string     // Name of the RBAC role
 	Init     bool       // First time created user - should be recreated
 	PassHash crypt.Hash // Hash + salt for the user password
 }
 
-func UserFind(login string) *User {
+func UserExists(login string) bool {
 	state.RLock()
 	defer state.RUnlock()
-	for _, user := range state.Users {
-		if user.Login == login {
-			return &user
+	_, ok := state.Users[login]
+	return ok
+}
+
+func UserGet(login string) User {
+	state.RLock()
+	defer state.RUnlock()
+
+	user, ok := state.Users[login]
+	if !ok {
+		user = User{
+			Login: login,
+			Init:  true,
 		}
 	}
+
+	return user
+}
+
+func (u *User) Save() error {
+	// Check manager is good
+	if err := u.IsValid(); err != nil {
+		return err
+	}
+
+	// Save current user to the array
+	state.Lock()
+	defer state.Unlock()
+	state.Users[u.Login] = *u
+	state.Save()
+
 	return nil
 }
 
-func UserGet(login string) *User {
-	if puser := UserFind(login); puser != nil {
-		return puser
-	}
-
+func UserRemove(login string) {
 	state.Lock()
 	defer state.Unlock()
-	state.Users = append(state.Users, User{Login: login, Init: true})
-	puser := &state.Users[len(state.Users)-1]
-	return puser
+	delete(state.Sources, login)
+	state.Save()
 }
 
-func (u *User) Set(password string, name string, manager string, init bool) error {
-	if manager != "" && UserFind(manager) == nil {
+func (u *User) IsValid() error {
+	u.RLock()
+	defer u.RUnlock()
+
+	// Check manager is good
+	if u.Manager != "" && !UserExists(u.Manager) {
 		return errors.New(InvalidUserManager)
 	}
-	u.Lock()
-	defer u.Unlock()
-	u.Name = name
-	u.Manager = manager
-	u.PassHash = crypt.Generate(password, nil)
-	u.Init = init
-	state.Save()
 
 	return nil
 }
 
-func (u *User) Remove() {
-	state.Lock()
-	defer state.Unlock()
-	for i, user := range state.Users {
-		if user.Login == u.Login {
-			// Just repace current user with last one and shrink the array
-			state.Users[i] = state.Users[len(state.Users)-1]
-			state.Users = state.Users[:len(state.Users)-1]
-			return
-		}
-	}
-	state.Save()
+func (u *User) PasswordSet(password string) {
+	u.Lock()
+	defer u.Unlock()
+	u.PassHash = crypt.Generate(password, nil)
 }
 
-func (u *User) CheckPassword(password string) bool {
+func (u *User) PasswordCheck(password string) bool {
 	u.RLock()
 	defer u.RUnlock()
 	return u.PassHash.IsEqual(password)

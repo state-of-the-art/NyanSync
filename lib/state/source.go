@@ -92,7 +92,7 @@ func (s *Source) IsValid() error {
 	if s.Type == "" {
 		return errors.New(InvalidSourceType)
 	}
-	if s.Manager != "" && UserFind(s.Manager) == nil {
+	if s.Manager != "" && !UserExists(s.Manager) {
 		return errors.New(InvalidSourceManager)
 	}
 

@@ -68,11 +68,11 @@ func (a *Access) IsValid() error {
 		return errors.New(InvalidAccessSourceId)
 	}
 	for _, u := range a.Users {
-		if UserFind(u) == nil {
+		if !UserExists(u) {
 			return errors.New(InvalidAccessUserLogin)
 		}
 	}
-	if a.Manager != "" && UserFind(a.Manager) == nil {
+	if a.Manager != "" && !UserExists(a.Manager) {
 		return errors.New(InvalidAccessManager)
 	}
 	return nil
