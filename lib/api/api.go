@@ -28,7 +28,7 @@ func initAuthV1() {
 		MaxRefresh:  time.Hour,
 		IdentityKey: identity_key,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
-			log.Println("[DEBUG]: PayloadFunc")
+			log.Println("[DEBUG] PayloadFunc")
 			if v, ok := data.(*User); ok {
 				return jwt.MapClaims{
 					identity_key: v.Login,
@@ -37,7 +37,7 @@ func initAuthV1() {
 			return jwt.MapClaims{}
 		},
 		IdentityHandler: func(c *gin.Context) interface{} {
-			log.Println("[DEBUG]: IdentityHandler")
+			log.Println("[DEBUG] IdentityHandler")
 			claims := jwt.ExtractClaims(c)
 			if state.UserExists(claims[identity_key].(string)) {
 				user := state.UserGet(claims[identity_key].(string))
@@ -46,7 +46,7 @@ func initAuthV1() {
 			return nil
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			log.Println("[DEBUG]: Authenticator")
+			log.Println("[DEBUG] Authenticator")
 			if c.ShouldBind(&login_data) != nil {
 				return "", jwt.ErrMissingLoginValues
 			}
@@ -62,7 +62,7 @@ func initAuthV1() {
 			}, nil
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {
-			log.Println("[DEBUG]: Authorizator")
+			log.Println("[DEBUG] Authorizator")
 			_, ok := data.(*state.User)
 			if !ok {
 				return false
@@ -124,6 +124,13 @@ func InitV1(router *gin.Engine) {
 			user.POST("/:login", UserPost)
 			user.DELETE("/:login", UserDelete)
 		}
+		role := v1.Group("/role")
+		{
+			role.GET("/", RoleGetList)
+			role.GET("/:id", RoleGet)
+			role.POST("/:id", RolePost)
+			role.DELETE("/:id", RoleDelete)
+		}
 		access := v1.Group("/access")
 		{
 			access.GET("/", AccessGetList)
@@ -144,18 +151,13 @@ func InitV1(router *gin.Engine) {
 		}
 	}
 
-	// Prepare permissions list
-	r := state.GetRBAC()
+	log.Println("[DEBUG] Prepare permissions list")
 	for _, route := range router.Routes() {
 		if !strings.HasPrefix(route.Path, v1.BasePath()) || strings.HasPrefix(route.Path, v1.BasePath()+"/auth") {
 			continue
 		}
 
-		if rbac.PermSet(r, getPermId(route.Path), route.Method) {
-			// TODO: simplify rbac save
-			state.SaveRBAC()
-		}
-
+		rbac.PermSet(getPermId(route.Path), route.Method)
 	}
 }
 
@@ -182,7 +184,7 @@ func ProcessRBAC(c *gin.Context) {
 		return
 	}
 
-	r := state.GetRBAC()
+	r := rbac.RBAC
 	perm := r.GetPermission(getPermId(c.FullPath()))
 	if perm == nil {
 		c.JSON(http.StatusForbidden, gin.H{"message": "Unable to find RBAC permission"})

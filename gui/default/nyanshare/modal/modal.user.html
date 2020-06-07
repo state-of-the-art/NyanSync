@@ -14,6 +14,23 @@
       <input type="text" ng-model="user.Name" name="user_name" class="form-control" placeholder="User name like 'John Doe' or 'Яж Программист'" required />
       <span ng-show="form.user_name.$dirty && form.user_name.$error.required" class="help-block">Name is required</span>
     </div>
+    <div class="form-group" ng-class="{ 'has-error': form.user_roles.$dirty && form.user_roles.$invalid }">
+      <label for="user_roles">Roles</label>
+      <tags-input ng-model="user_roles" name="user_roles" placeholder="User roles to access the API"
+          add-on-paste="true"
+          min-tags="1"
+          on-tag-adding="vm.checkRole($tag)"
+          key-property="Id"
+          display-property="Id">
+        <auto-complete source="vm.loadRoles($query)"
+          min-length="0"
+          load-on-focus="true"
+          load-on-empty="true"
+          max-results-to-show="32"
+          debounce-delay="500"></auto-complete>
+      </tags-input>
+      <span ng-show="form.user_roles.$dirty && form.user_roles.$error.valid" class="help-block">Role should be set</span>
+    </div>
     <div class="form-group" ng-class="{ 'has-error': form.user_password.$dirty && form.user_password.$invalid }">
       <label for="user_password">Password</label>
       <input type="password" ng-model="user.Password" name="user_password" class="form-control" placeholder="Please enter strong password" required />

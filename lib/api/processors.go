@@ -59,7 +59,7 @@ func UserGet(c *gin.Context) {
 
 func UserPost(c *gin.Context) {
 	acc := ContextAccount(c)
-	r := state.GetRBAC()
+	r := rbac.RBAC
 	perm := r.GetPermission(getPermId(c.FullPath()))
 
 	var data User
@@ -166,6 +166,45 @@ func UserDelete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "User removed"})
 }
 
+func RoleGetList(c *gin.Context) {
+	query := c.Query("q")
+	roles := rbac.RoleList()
+	var out_roles []rbac.Role
+	for _, r := range roles {
+		if strings.Contains(r.Id, query) || strings.Contains(r.Description, query) {
+			out_roles = append(out_roles, r)
+		}
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Get roles list", "data": out_roles})
+}
+
+func RoleGet(c *gin.Context) {
+	id := c.Param("id")
+	if !rbac.RoleExists(id) {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Role not found"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Get role", "data": rbac.RoleGet(id)})
+}
+
+func RolePost(c *gin.Context) {
+	/*acc := ContextAccount(c)
+	r := rbac.RBAC
+	perm := r.GetPermission(getPermId(c.FullPath()))
+
+	c.JSON(http.StatusOK, gin.H{"message": "Role stored", "data": role})*/
+}
+
+func RoleDelete(c *gin.Context) {
+	id := c.Param("id")
+	if !rbac.RoleExists(id) {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Role not found"})
+		return
+	}
+	rbac.RoleRemove(id)
+	c.JSON(http.StatusOK, gin.H{"message": "Role removed"})
+}
+
 func AccessGetList(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Get access list", "data": state.AccessList()})
 }
@@ -181,7 +220,7 @@ func AccessGet(c *gin.Context) {
 
 func AccessPost(c *gin.Context) {
 	acc := ContextAccount(c)
-	r := state.GetRBAC()
+	r := rbac.RBAC
 	perm := r.GetPermission(getPermId(c.FullPath()))
 
 	var data state.Access
@@ -237,7 +276,7 @@ func SourceGet(c *gin.Context) {
 
 func SourcePost(c *gin.Context) {
 	acc := ContextAccount(c)
-	r := state.GetRBAC()
+	r := rbac.RBAC
 	perm := r.GetPermission(getPermId(c.FullPath()))
 
 	var data state.Source

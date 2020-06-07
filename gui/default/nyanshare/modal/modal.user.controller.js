@@ -3,11 +3,11 @@
 
   angular
     .module('app')
-    .controller('UserController', ['user', '$scope', '$uibModalInstance', '$uibModal', 'UserService', 'AuthService',
-      function( user, $scope, $uibModalInstance, $uibModal, UserService, AuthService ) {
+    .controller('UserController', ['user', '$scope', '$uibModalInstance', '$uibModal', 'UserService', 'AuthService', 'RoleService',
+      function( user, $scope, $uibModalInstance, $uibModal, UserService, AuthService, RoleService ) {
         var vm = this;
 
-        if( user && user.Login )
+        if( user instanceof UserService )
           vm.title = 'Edit user "' + user.Name + '"';
         else
           vm.title = 'Create new user';
@@ -26,6 +26,13 @@
             $scope.user.Manager = AuthService.GetTokenClaims().id;
           }
 
+          $scope.user_roles = [];
+          if( $scope.user.Roles !== null ) {
+            for( var r of $scope.user.Roles )
+              $scope.user_roles.push({Id: r});
+          }
+
+          $scope.used_logins = [];
           // To validate the used user logins
           UserService.query().$promise.then(function(users){
             // Make sure while edit we can reuse the same login of user
@@ -36,6 +43,12 @@
         vm.submit = function() {
           if( !$scope.user._orig_login )
             $scope.user._orig_login = $scope.user.Login
+
+          // Add list of roles to the user object
+          $scope.user.Roles = [];
+          for( const r of $scope.user_roles )
+            $scope.user.Roles.push(r.Id);
+
           $scope.user.$save().then(function() {
             $uibModalInstance.close($scope.user);
           });
@@ -67,6 +80,44 @@
               });
             }
           });
+        };
+
+        vm.loadRoles = function(query) {
+          if( query )
+            return RoleService.query({q: query, cache: false}).$promise;
+          return RoleService.query().$promise;
+        };
+        vm.checkRole = function(data) {
+          return RoleService.get({Id: data.Id}).$promise.then(function(role) {
+            // Check the role is present only once
+            for( const r of $scope.user_roles ) {
+              if( r.Id === role.Id )
+                return false;
+            }
+            Object.assign(data, role);
+          }, function(error) {
+            return vm.createRole(data);
+          });
+        };
+        vm.createRole = function(data) {
+          var promise = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'nyanshare/modal/modal.role.html',
+            controller: 'RoleController',
+            controllerAs: 'vm',
+            size: 'md',
+            resolve: {
+              role: function(){ return data; },
+            },
+          }).result.then(function( result ) {
+            RoleService.query({cache: false});
+            if( result instanceof RoleService ) {
+              data.Id = result.Id
+            }
+          });
+          return promise;
         };
       }
     ])

@@ -7,7 +7,7 @@
       function( access, $scope, $uibModalInstance, $uibModal, AccessService, UserService, SourceService, AuthService ) {
         var vm = this;
 
-        if( access && access.Id )
+        if( access instanceof AccessService )
           vm.title = 'Edit access "' + access.Id + '"';
         else
           vm.title = 'Create new access';
@@ -27,6 +27,7 @@
           }
 
           // To validate the source ids
+          $scope.source_ids = []
           SourceService.query().$promise.then(function(sources){
             $scope.source_ids = sources.map(s => s.Id);
           });
@@ -87,6 +88,8 @@
           });
         };
         vm.createUser = function(data) {
+          // Set guest role by default
+          data.Roles = ['guest'];
           var promise = $uibModal.open({
             animation: true,
             ariaLabelledBy: 'modal-title',

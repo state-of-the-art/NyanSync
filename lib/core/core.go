@@ -8,6 +8,7 @@ import (
 	"github.com/state-of-the-art/NyanSync/lib/api"
 	"github.com/state-of-the-art/NyanSync/lib/config"
 	"github.com/state-of-the-art/NyanSync/lib/gui"
+	"github.com/state-of-the-art/NyanSync/lib/rbac"
 	"github.com/state-of-the-art/NyanSync/lib/state"
 )
 
@@ -25,8 +26,10 @@ func RunHTTPServer() {
 
 	api.InitV1(router)
 	gui.Init(config.Cfg().GuiPath, router)
-	state.LoadRBAC()
-	state.GetRBAC().Init()
+
+	rbac.Load()
+	rbac.Init()
+	rbac.Save()
 
 	log.Fatal(router.Run(config.Cfg().Endpoint.Address))
 }

@@ -15,7 +15,7 @@ import (
 )
 
 func (cfg *Config) SaveNow() {
-	log.Println("Saving yaml config", cfg.FilePathGet())
+	log.Println("[INFO] Saving yaml config", cfg.FilePathGet())
 	if err := os.MkdirAll(goconfig.Path, 0755); err != nil {
 		log.Panic("Error create config dir", err)
 	}

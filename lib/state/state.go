@@ -11,7 +11,6 @@ import (
 	"github.com/state-of-the-art/NyanSync/lib/config"
 	"github.com/state-of-the-art/NyanSync/lib/crypt"
 	"github.com/state-of-the-art/NyanSync/lib/location"
-	"github.com/state-of-the-art/NyanSync/lib/rbac"
 )
 
 const (
@@ -74,9 +73,6 @@ type st struct {
 
 	Access   map[string]Access `json:"-"` // Stored to another file
 	access_w bool
-
-	RBAC   *rbac.RBAC `json:"-"` // Stored to another file
-	rbac_w bool
 }
 
 // Current application state
@@ -101,19 +97,10 @@ func (s *st) SaveNow() {
 		s.access_w = false
 		s.Unlock()
 	}
-	if s.rbac_w {
-		s.RLock()
-		saveJson(s.RBAC, location.RealFilePath(config.Cfg().RBACFilePath))
-		s.RUnlock()
-
-		s.Lock()
-		s.rbac_w = false
-		s.Unlock()
-	}
 }
 
 func saveJson(s interface{}, path string) {
-	log.Println("Saving json", path)
+	log.Println("[DEBUG] Saving json", path)
 	if err := os.MkdirAll(filepath.Dir(path), 0750); err != nil {
 		log.Panic("Unable to create save dir: ", err)
 	}
@@ -136,10 +123,6 @@ func (s *st) SaveAccess() {
 	go s.save(&s.access_w)
 }
 
-func SaveRBAC() {
-	go state.save(&state.rbac_w)
-}
-
 func (s *st) save(flag *bool) {
 	s.Lock()
 	defer s.Unlock()
@@ -160,7 +143,6 @@ func (s *st) save(flag *bool) {
 func (s *st) Load() bool {
 	var ok = s.loadState()
 	s.loadAccess()
-	s.RBAC = rbac.New()
 
 	if state.Users == nil {
 		state.Users = make(map[string]User)
@@ -204,17 +186,6 @@ func (s *st) loadAccess() {
 	}
 }
 
-func LoadRBAC() {
-	path := location.RealFilePath(config.Cfg().RBACFilePath)
-	log.Println("[DEBUG] Loading rbac from file", path)
-	if file, err := os.OpenFile(path, os.O_RDONLY, 640); err == nil {
-		defer file.Close()
-		if err = state.RBAC.LoadJSON(file); err != nil {
-			log.Panic("Unable to load rbac file: ", err)
-		}
-	}
-}
-
 func UsersList() []User {
 	out := make([]User, 0, len(state.Users))
 
@@ -240,8 +211,4 @@ func AccessList() []Access {
 		out = append(out, value)
 	}
 	return out
-}
-
-func GetRBAC() *rbac.RBAC {
-	return state.RBAC
 }

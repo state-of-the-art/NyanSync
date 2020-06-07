@@ -1,0 +1,34 @@
+<div class="modal-header">
+  <h3 class="modal-title" id="modal-title">{{ vm.title }}</h3>
+</div>
+<form name="form" role="form" ng-submit="vm.submit()">
+  <div class="modal-body" id="modal-body">
+    <div class="form-group" ng-class="{ 'has-error': form.role_id.$dirty && form.role_id.$invalid }">
+      <label for="role_id">ID</label>
+      <input type="text" ng-model="role.Id" name="role_id" class="form-control" placeholder="Unique id for a role" required my-role-unique />
+      <span ng-show="form.role_id.$dirty && form.role_id.$error.required" class="help-block">ID is required</span>
+      <span ng-show="form.role_id.$dirty && form.role_id.$error.roleunique" class="help-block">Specified ID is not unique</span>
+    </div>
+    <div class="form-group" ng-class="{ 'has-error': form.role_description.$dirty && form.role_description.$invalid }">
+      <label for="role_description">Description</label>
+      <input type="text" ng-model="role.Description" name="role_description" class="form-control" placeholder="Role desciption like 'For read-only users'" required />
+      <span ng-show="form.role_description.$dirty && form.role_description.$error.required" class="help-block">Name is required</span>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <i ng-if="vm.data_loading" class="fa fa-spinner loading-progress" aria-hidden="true"></i>
+    <span class="tooltip-wrapper" title="{{ !form.$dirty || form.$invalid ? 'Form not changed or invalid' : '' }}">
+      <button class="btn btn-primary" type="submit" ng-disabled="!form.$dirty || form.$invalid || vm.data_loading">
+        <span class="fas fa-check"></span>&nbsp;<span translate>Save</span>
+      </button>
+    </span>
+    <button class="btn btn-default" type="button" ng-click="vm.cancel()">
+      <span class="fas fa-times"></span>&nbsp;<span translate>Cancel</span>
+    </button>
+    <span class="tooltip-wrapper pull-left" title="{{ form.$dirty ? 'Remove not available for changed item' : '' }}">
+      <button type="button" class="btn btn-warning" ng-click="vm.remove()" ng-if="role._orig_id" ng-disabled="form.$dirty">
+        <span class="fas fa-minus-circle"></span>&nbsp;<span translate>Remove</span>
+      </button>
+    </span>
+  </div>
+</form>
