@@ -41,7 +41,7 @@ func initAuthV1() {
 			claims := jwt.ExtractClaims(c)
 			if state.UserExists(claims[identity_key].(string)) {
 				user := state.UserGet(claims[identity_key].(string))
-				return user
+				return &user
 			}
 			return nil
 		},
@@ -198,9 +198,9 @@ func ProcessRBAC(c *gin.Context) {
 			c.Abort()
 		}
 	case "POST":
-		if !r.IsGranted(acc.Role, perm, rbac.Update) ||
-			!r.IsGranted(acc.Role, perm, rbac.Create) ||
-			!r.IsGranted(acc.Role, perm, rbac.UpdateSelf) {
+		if !(r.IsGranted(acc.Role, perm, rbac.Update) ||
+			r.IsGranted(acc.Role, perm, rbac.Create) ||
+			r.IsGranted(acc.Role, perm, rbac.UpdateSelf)) {
 			c.JSON(http.StatusForbidden, gin.H{"message": "No update/create access"})
 			c.Abort()
 		}

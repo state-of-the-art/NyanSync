@@ -135,7 +135,6 @@ func UserPost(c *gin.Context) {
 			return
 		}
 
-		user := state.UserGet(c.Param("login"))
 		if data.Login != user.Login {
 			c.JSON(http.StatusBadRequest, gin.H{"message": "Not the same login used in body and path"})
 			return
