@@ -27,7 +27,7 @@ func Init() {
 		admin_pass := crypt.RandString(32)
 		user := UserGet(init_admin_login)
 		user.PasswordSet(admin_pass)
-		user.Role = "admin"
+		user.Roles = []string{"admin"}
 		user.Name = "Administrator"
 		user.Manager = "" // Noone manages admin
 		user.Save()

@@ -176,8 +176,8 @@ func ContextAccount(c *gin.Context) *state.User {
 
 func ProcessRBAC(c *gin.Context) {
 	acc := ContextAccount(c)
-	if acc.Role == "" {
-		c.JSON(http.StatusForbidden, gin.H{"message": "Account role is not set"})
+	if len(acc.Roles) == 0 {
+		c.JSON(http.StatusForbidden, gin.H{"message": "Account roles is empty"})
 		c.Abort()
 		return
 	}
@@ -193,19 +193,19 @@ func ProcessRBAC(c *gin.Context) {
 	// Check permissions
 	switch c.Request.Method {
 	case "GET":
-		if !r.IsGranted(acc.Role, perm, rbac.Read) {
+		if !r.AnyGranted(acc.Roles, perm, rbac.Read) {
 			c.JSON(http.StatusForbidden, gin.H{"message": "No read access"})
 			c.Abort()
 		}
 	case "POST":
-		if !(r.IsGranted(acc.Role, perm, rbac.Update) ||
-			r.IsGranted(acc.Role, perm, rbac.Create) ||
-			r.IsGranted(acc.Role, perm, rbac.UpdateSelf)) {
+		if !(r.AnyGranted(acc.Roles, perm, rbac.Update) ||
+			r.AnyGranted(acc.Roles, perm, rbac.Create) ||
+			r.AnyGranted(acc.Roles, perm, rbac.UpdateSelf)) {
 			c.JSON(http.StatusForbidden, gin.H{"message": "No update/create access"})
 			c.Abort()
 		}
 	case "DELETE":
-		if !r.IsGranted(acc.Role, perm, rbac.Delete) {
+		if !r.AnyGranted(acc.Roles, perm, rbac.Delete) {
 			c.JSON(http.StatusForbidden, gin.H{"message": "No delete access"})
 			c.Abort()
 		}

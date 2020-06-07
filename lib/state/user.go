@@ -18,7 +18,7 @@ type User struct {
 	Login    string     // Login id of the user
 	Name     string     // Real name of the user
 	Manager  string     // Controlling manager
-	Role     string     // Name of the RBAC role
+	Roles    []string   // List of the RBAC roles
 	Init     bool       // First time created user - should be recreated
 	PassHash crypt.Hash // Hash + salt for the user password
 }
@@ -63,7 +63,7 @@ func (u *User) Save() error {
 func UserRemove(login string) {
 	state.Lock()
 	defer state.Unlock()
-	delete(state.Sources, login)
+	delete(state.Users, login)
 	state.Save()
 }
 

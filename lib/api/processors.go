@@ -18,7 +18,7 @@ type User struct {
 	Login       string
 	Name        string
 	Manager     string
-	Role        string
+	Roles       []string
 	Password    string
 	PasswordNew string
 }
@@ -79,7 +79,7 @@ func UserPost(c *gin.Context) {
 
 		if user.Login == acc.Login {
 			// Check access for self update
-			if !r.IsGranted(acc.Role, perm, rbac.UpdateSelf) {
+			if !r.AnyGranted(acc.Roles, perm, rbac.UpdateSelf) {
 				c.JSON(http.StatusForbidden, gin.H{"message": "No update access"})
 				return
 			}
@@ -115,13 +115,13 @@ func UserPost(c *gin.Context) {
 			}
 		} else if user.Manager == acc.Login {
 			// Check access to update
-			if !r.IsGranted(acc.Role, perm, rbac.Update) {
+			if !r.AnyGranted(acc.Roles, perm, rbac.Update) {
 				c.JSON(http.StatusForbidden, gin.H{"message": "No update access"})
 				return
 			}
 
 			user.Manager = data.Manager
-			user.Role = data.Role
+			user.Roles = data.Roles
 		} else {
 			c.JSON(http.StatusForbidden, gin.H{"message": "You have no access to modify this user"})
 			return
@@ -130,7 +130,7 @@ func UserPost(c *gin.Context) {
 		// CREATE USER
 
 		// Check permission
-		if !r.IsGranted(acc.Role, perm, rbac.Create) {
+		if !r.AnyGranted(acc.Roles, perm, rbac.Create) {
 			c.JSON(http.StatusForbidden, gin.H{"message": "No create access"})
 			return
 		}
@@ -143,7 +143,7 @@ func UserPost(c *gin.Context) {
 		// Set params
 		user.Name = data.Name
 		user.Manager = data.Manager
-		user.Role = data.Role
+		user.Roles = data.Roles
 		user.PasswordSet(data.Password)
 	}
 
@@ -191,7 +191,7 @@ func AccessPost(c *gin.Context) {
 	}
 	if c.Param("id") == "/" {
 		// Check create permission
-		if !r.IsGranted(acc.Role, perm, rbac.Create) {
+		if !r.AnyGranted(acc.Roles, perm, rbac.Create) {
 			c.JSON(http.StatusForbidden, gin.H{"message": "No create access"})
 			return
 		}
@@ -199,7 +199,7 @@ func AccessPost(c *gin.Context) {
 	} else if c.Param("id") != data.Id {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Unable to change the access ID"})
 		return
-	} else if !r.IsGranted(acc.Role, perm, rbac.Update) { // Check update permission
+	} else if !r.AnyGranted(acc.Roles, perm, rbac.Update) { // Check update permission
 		c.JSON(http.StatusForbidden, gin.H{"message": "No update access"})
 		return
 	}
@@ -248,11 +248,11 @@ func SourcePost(c *gin.Context) {
 
 	// Check permission
 	if state.SourceExists(c.Param("id")) {
-		if !r.IsGranted(acc.Role, perm, rbac.Update) {
+		if !r.AnyGranted(acc.Roles, perm, rbac.Update) {
 			c.JSON(http.StatusForbidden, gin.H{"message": "No update access"})
 			return
 		}
-	} else if !r.IsGranted(acc.Role, perm, rbac.Create) {
+	} else if !r.AnyGranted(acc.Roles, perm, rbac.Create) {
 		c.JSON(http.StatusForbidden, gin.H{"message": "No create access"})
 		return
 	}

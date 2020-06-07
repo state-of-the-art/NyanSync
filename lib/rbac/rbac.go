@@ -38,6 +38,8 @@ func (r *RBAC) Init() {
 	// Creating guest role
 	if !r.IsRoleExist(guest_role_id) {
 		r.RegisterRole(guest_role_id, "Guest default role")
+		// TODO: use api permission, not a static string not connected to api
+		r.Permit(guest_role_id, r.GetPermission("/api/v1/navigate"), Read)
 	}
 
 	// Don't need to save, because this roles are in-memory
