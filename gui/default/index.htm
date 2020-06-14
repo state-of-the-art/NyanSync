@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="app" class="ng-cloak">
+<html lang="en" ng-app="app" ng-controller="IndexController as vm" class="ng-cloak">
 <head>
   <meta charset="utf-8"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
@@ -55,7 +55,7 @@
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            <li><a href="" ng-click="vm.userProfile()"><span class="fas fa-fw fa-cog"></span>&nbsp;<span translate>Account</span></a></li>
+            <li><a href="" ng-click="vm.accountEdit()"><span class="fas fa-fw fa-cog"></span>&nbsp;<span translate>Account</span></a></li>
             <li><a href="" ng-click="account.Logout()"><span class="fas fa-fw fa-power-off"></span>&nbsp;<span translate>Logout</span></a></li>
           </ul>
         </li>
@@ -107,6 +107,7 @@
   <script type="text/javascript" src="nyanshare/services/user.service.js"></script>
   <script type="text/javascript" src="nyanshare/services/role.service.js"></script>
 
+  <script type="text/javascript" src="nyanshare/index.controller.js"></script>
   <script type="text/javascript" src="nyanshare/login/login.controller.js"></script>
   <script type="text/javascript" src="nyanshare/home/home.controller.js"></script>
   <script type="text/javascript" src="nyanshare/navigator/navigator.controller.js"></script>

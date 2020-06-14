@@ -69,7 +69,7 @@
             },
             'responseError': function( res ) {
               $injector.get('Notification').error('API: ' + res.data.message);
-              if( res.status === 401 || res.status === 403 ) {
+              if( res.status === 401 ) {
                 $injector.get('AuthService').Logout(false);
               }
               return $q.reject(res);

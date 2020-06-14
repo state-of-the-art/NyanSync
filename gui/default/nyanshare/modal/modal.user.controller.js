@@ -7,6 +7,7 @@
       function( user, $scope, $uibModalInstance, $uibModal, UserService, AuthService, RoleService ) {
         var vm = this;
 
+        console.log(user);
         if( user instanceof UserService )
           vm.title = 'Edit user "' + user.Name + '"';
         else
