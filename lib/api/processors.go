@@ -314,15 +314,49 @@ func SourceDelete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Source removed"})
 }
 
+func navigateCheckAccess(account *state.User, source *state.Source, path string, access_list *[]state.Access) (partial bool, full bool) {
+	if source.Manager == account.Login {
+		// Full access for manager
+		return true, true
+	} else {
+		if len(*access_list) == 0 {
+			// Fill the access list cache with available user access items
+			lst := state.AccessListForUser(account.Login)
+			*access_list = lst
+		}
+		for _, a := range *access_list {
+			if source.Id == a.SourceId {
+				if len(path) == 0 {
+					// Only for source list
+					partial = true
+				} else if a.Path == path || strings.HasPrefix(path+"/", a.Path) {
+					// Exact path match or beyond the given path
+					return true, true
+				} else if strings.HasPrefix(a.Path, path+"/") {
+					// Check path in the given access path
+					partial = true
+				}
+			}
+		}
+	}
+
+	return
+}
+
 func NavigateGetList(c *gin.Context) {
+	acc := ContextAccount(c)
 	// Cut the "/" char from path
 	p := c.Param("path")[1:]
 	var out []NavigateItem
+	var access_list []state.Access // cache
 	if len(p) == 0 {
-		for _, v := range state.SourceList() {
+		for _, s := range state.SourceList() {
+			if ok, _ := navigateCheckAccess(acc, &s, "", &access_list); !ok {
+				continue
+			}
 			out = append(out, NavigateItem{
 				FileSystemItem: processors.FileSystemItem{
-					Name: v.Id,
+					Name: s.Id,
 					Type: processors.Folder,
 				},
 				Preview: "/assets/img/navigate/source.svg",
@@ -330,21 +364,29 @@ func NavigateGetList(c *gin.Context) {
 		}
 	} else {
 		source_path := strings.SplitN(p, "/", 2)
-		fmt.Printf("DEBUG: naviage source: %s\n", source_path)
+		if len(source_path) == 1 {
+			source_path = append(source_path, "")
+		}
+
 		if !state.SourceExists(source_path[0]) {
 			c.JSON(http.StatusNotFound, gin.H{"message": "Source not found"})
 			return
 		}
 
 		source := state.SourceGet(source_path[0])
+		partial, full_access := navigateCheckAccess(acc, &source, source_path[1], &access_list)
+		if !partial {
+			// Actually forbidden, but we shouldn't expose such information
+			c.JSON(http.StatusNotFound, gin.H{"message": "Source not found"})
+			return
+		}
+
 		uri, err := url.ParseRequestURI(source.Uri)
 		if err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"message": "Wrong source URI"})
 			return
 		}
-		if len(source_path) > 1 {
-			uri.Path = path.Join(uri.Path, source_path[1])
-		}
+		uri.Path = path.Join(uri.Path, source_path[1])
 
 		list, err := processors.UriGetList(uri)
 		if err != nil {
@@ -352,7 +394,11 @@ func NavigateGetList(c *gin.Context) {
 			return
 		}
 		for _, item := range list {
-			fmt.Printf("DEBUG: item: %s\n", item)
+			if !full_access {
+				if ok, _ := navigateCheckAccess(acc, &source, path.Join(source_path[1], item.Name), &access_list); !ok {
+					continue
+				}
+			}
 			out_item := NavigateItem{
 				FileSystemItem: item,
 			}

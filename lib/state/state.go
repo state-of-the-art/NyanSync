@@ -189,6 +189,9 @@ func (s *st) loadAccess() {
 func UsersList() []User {
 	out := make([]User, 0, len(state.Users))
 
+	state.RLock()
+	defer state.RUnlock()
+
 	for _, value := range state.Users {
 		out = append(out, value)
 	}
@@ -198,6 +201,9 @@ func UsersList() []User {
 func SourceList() []Source {
 	out := make([]Source, 0, len(state.Sources))
 
+	state.RLock()
+	defer state.RUnlock()
+
 	for _, value := range state.Sources {
 		out = append(out, value)
 	}
@@ -206,6 +212,9 @@ func SourceList() []Source {
 
 func AccessList() []Access {
 	out := make([]Access, 0, len(state.Access))
+
+	state.RLock()
+	defer state.RUnlock()
 
 	for _, value := range state.Access {
 		out = append(out, value)

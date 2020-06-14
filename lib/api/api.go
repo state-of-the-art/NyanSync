@@ -107,7 +107,6 @@ func InitV1(router *gin.Engine) {
 		api_data.JWT.MiddlewareFunc(),
 		// Processing RBAC
 		ProcessRBAC,
-		// TODO: check access to navigator path
 	)
 	{
 		auth := v1.Group("/auth")

@@ -85,3 +85,20 @@ func (a *Access) NewId() {
 		a.NewId()
 	}
 }
+
+func AccessListForUser(login string) []Access {
+	var out []Access
+
+	state.RLock()
+	defer state.RUnlock()
+
+	for _, access := range state.Access {
+		for _, u := range access.Users {
+			if u == login {
+				out = append(out, access)
+			}
+		}
+	}
+
+	return out
+}
