@@ -3,8 +3,8 @@
 
   angular
     .module('app')
-    .controller('NavigatorController', ['$scope', '$uibModal', 'NavigatorService', 'DropdownService',
-      function( $scope, $uibModal, NavigatorService, DropdownService ) {
+    .controller('NavigatorController', ['$scope', '$uibModal', 'NavigatorService', 'SourceService', 'DropdownService',
+      function( $scope, $uibModal, NavigatorService, SourceService, DropdownService ) {
         var vm = this;
         $scope.vm = vm;
 
@@ -35,16 +35,25 @@
             return;
 
           // Create dropdown menu
-          DropdownService.Create({
+          var menu = {
             'Share': function() {
               vm.shareItem(item);
             },
-          }, p);
+          };
+          if( item.Type == 'source') {
+            menu['Edit'] = function() {
+              console.log("Run Edit with item ", item);
+              SourceService.get({'Id': item.Name}).$promise.then(function(source){
+                vm.sourceEdit(source);
+              });
+            };
+          }
+          DropdownService.Create(menu, p);
         };
 
         vm.itemClick = function(item, e) {
           if( item === vm.navigator_active ) {
-            if( item.Type == 'folder' )
+            if( ['folder', 'source'].includes(item.Type) )
               vm.navigateChildren(item.Name);
           } else {
             // For touch devices to use double click system
@@ -79,12 +88,48 @@
               },
             },
           }).result.then(function() {
-            // Update the whole list of sources from API
-            vm.sources = SourceService.query({cache: false});
+            // Update navigator view
+            vm.navigatePath([]);
           });
         };
 
         vm.navigatePath([]);
+
+        vm.sourceAdd = function() {
+          $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'nyanshare/modal/modal.source.html',
+            controller: 'SourceController',
+            controllerAs: 'vm',
+            size: 'lg',
+            resolve: {
+              source: null,
+            },
+          }).result.then(function() {
+            // Update navigator view
+            vm.navigatePath([]);
+          });
+        };
+        vm.sourceEdit = function(source) {
+          console.log("Run source edit with ", source);
+          $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'nyanshare/modal/modal.source.html',
+            controller: 'SourceController',
+            controllerAs: 'vm',
+            size: 'lg',
+            resolve: {
+              source: function(){ return source; },
+            },
+          }).result.then(function() {
+            // Update navigator view
+            vm.navigatePath([]);
+          });
+        };
       }
     ]);
 

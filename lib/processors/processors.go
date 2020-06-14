@@ -3,6 +3,7 @@ package processors
 type FileSystemType string
 
 const (
+	Source FileSystemType = "source"
 	Folder FileSystemType = "folder"
 	Binary FileSystemType = "binary"
 )

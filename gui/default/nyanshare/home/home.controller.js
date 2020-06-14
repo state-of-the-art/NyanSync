@@ -10,13 +10,7 @@
         (function initController() {
         })();
       }
-    ]).directive('nyanshareSources', function(){
-      return {
-        restrict: 'A',
-        replace: true,
-        templateUrl:'nyanshare/sources/sources.view.html',
-      }
-    }).directive('nyanshareNavigator', function(){
+    ]).directive('nyanshareNavigator', function(){
       return {
         restrict: 'A',
         replace: true,
