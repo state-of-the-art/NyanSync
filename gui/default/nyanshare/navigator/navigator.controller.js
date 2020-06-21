@@ -3,8 +3,8 @@
 
   angular
     .module('app')
-    .controller('NavigatorController', ['$scope', '$uibModal', 'NavigatorService', 'SourceService', 'DropdownService',
-      function( $scope, $uibModal, NavigatorService, SourceService, DropdownService ) {
+    .controller('NavigatorController', ['$scope', '$uibModal', '$localStorage', 'urls', 'NavigatorService', 'SourceService', 'DropdownService',
+      function( $scope, $uibModal, $localStorage, urls, NavigatorService, SourceService, DropdownService ) {
         var vm = this;
         $scope.vm = vm;
 
@@ -38,14 +38,27 @@
           var menu = {
             'Share': function() {
               vm.shareItem(item);
+              return false;
             },
           };
           if( item.Type == 'source') {
             menu['Edit'] = function() {
-              console.log("Run Edit with item ", item);
               SourceService.get({'Id': item.Name}).$promise.then(function(source){
                 vm.sourceEdit(source);
               });
+              return false;
+            };
+          }
+          if( item.Type == 'binary') {
+            menu['Download'] = function() {
+              /* This way downloads file without asking user to save
+              $http.get(urls.BASE_API + 'download/' + vm.navigator_path.concat(item.Name).join('/'), {
+                responseType: 'blob',
+              });*/
+              // TODO: replace with a good download way using one-time token
+              window.location = urls.BASE_API + 'download/' + vm.navigator_path.concat(item.Name).join('/') +
+                '?token=' + $localStorage.account.token;
+              return false;
             };
           }
           DropdownService.Create(menu, p);
@@ -89,7 +102,7 @@
             },
           }).result.then(function() {
             // Update navigator view
-            vm.navigatePath([]);
+            vm.navigatePath(vm.navigator_path);
           });
         };
 
@@ -109,7 +122,7 @@
             },
           }).result.then(function() {
             // Update navigator view
-            vm.navigatePath([]);
+            vm.navigatePath(vm.navigator_path);
           });
         };
         vm.sourceEdit = function(source) {
@@ -127,7 +140,7 @@
             },
           }).result.then(function() {
             // Update navigator view
-            vm.navigatePath([]);
+            vm.navigatePath(vm.navigator_path);
           });
         };
       }

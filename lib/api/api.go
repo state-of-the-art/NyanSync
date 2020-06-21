@@ -27,6 +27,7 @@ func initAuthV1() {
 		Key:         []byte("secret key"), // TODO: replace
 		MaxRefresh:  time.Hour,
 		IdentityKey: identity_key,
+		TokenLookup: "header: Authorization, query: token",
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			log.Println("[DEBUG] PayloadFunc")
 			if v, ok := data.(*User); ok {

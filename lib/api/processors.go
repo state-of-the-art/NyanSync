@@ -463,7 +463,7 @@ func DownloadGet(c *gin.Context) {
 	c.Header("Content-Description", "File Transfer")
 	c.Header("Content-Transfer-Encoding", "binary")
 	c.Header("Content-Disposition", "attachment; filename="+file.Name)
-	c.Header("Content-Size", strconv.FormatInt(int64(file.Size), 10))
+	c.Header("Content-Length", strconv.FormatInt(int64(file.Size), 10))
 	c.Header("Content-Type", "application/octet-stream")
 
 	chan_stream := make(chan []byte, 1)
