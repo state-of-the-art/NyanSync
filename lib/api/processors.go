@@ -2,9 +2,12 @@ package api
 
 import (
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -314,7 +317,7 @@ func SourceDelete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Source removed"})
 }
 
-func navigateCheckAccess(account *state.User, source *state.Source, path string, access_list *[]state.Access) (partial bool, full bool) {
+func sourcePathCheckAccess(account *state.User, source *state.Source, path string, access_list *[]state.Access) (partial bool, full bool) {
 	if source.Manager == account.Login {
 		// Full access for manager
 		return true, true
@@ -351,7 +354,7 @@ func NavigateGetList(c *gin.Context) {
 	var access_list []state.Access // cache
 	if len(p) == 0 {
 		for _, s := range state.SourceList() {
-			if ok, _ := navigateCheckAccess(acc, &s, "", &access_list); !ok {
+			if ok, _ := sourcePathCheckAccess(acc, &s, "", &access_list); !ok {
 				continue
 			}
 			out = append(out, NavigateItem{
@@ -374,7 +377,7 @@ func NavigateGetList(c *gin.Context) {
 		}
 
 		source := state.SourceGet(source_path[0])
-		partial, full_access := navigateCheckAccess(acc, &source, source_path[1], &access_list)
+		partial, full_access := sourcePathCheckAccess(acc, &source, source_path[1], &access_list)
 		if !partial {
 			// Actually forbidden, but we shouldn't expose such information
 			c.JSON(http.StatusNotFound, gin.H{"message": "Source not found"})
@@ -395,7 +398,7 @@ func NavigateGetList(c *gin.Context) {
 		}
 		for _, item := range list {
 			if !full_access {
-				if ok, _ := navigateCheckAccess(acc, &source, path.Join(source_path[1], item.Name), &access_list); !ok {
+				if ok, _ := sourcePathCheckAccess(acc, &source, path.Join(source_path[1], item.Name), &access_list); !ok {
 					continue
 				}
 			}
@@ -413,4 +416,72 @@ func NavigateGetList(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Get navigate data", "data": out})
+}
+
+func DownloadGet(c *gin.Context) {
+	acc := ContextAccount(c)
+	// Cut the "/" char from path
+	p := c.Param("path")[1:]
+	var access_list []state.Access // cache
+
+	if len(p) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Path need to be specified"})
+		return
+	}
+	source_path := strings.SplitN(p, "/", 2)
+	if len(source_path) != 2 {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Unable to download source"})
+		return
+	}
+
+	if !state.SourceExists(source_path[0]) {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Source not found"})
+		return
+	}
+
+	source := state.SourceGet(source_path[0])
+	_, full_access := sourcePathCheckAccess(acc, &source, source_path[1], &access_list)
+	if !full_access {
+		// Actually forbidden, but we shouldn't expose such information
+		c.JSON(http.StatusNotFound, gin.H{"message": "Source not found"})
+		return
+	}
+
+	uri, err := url.ParseRequestURI(source.Uri)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Wrong source URI"})
+		return
+	}
+	uri.Path = path.Join(uri.Path, source_path[1])
+
+	file, err := processors.UriGetFile(uri)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Unable to stream URI"})
+		return
+	}
+
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Transfer-Encoding", "binary")
+	c.Header("Content-Disposition", "attachment; filename="+file.Name)
+	c.Header("Content-Size", strconv.FormatInt(int64(file.Size), 10))
+	c.Header("Content-Type", "application/octet-stream")
+
+	chan_stream := make(chan []byte, 1)
+	defer func() {
+		defer func() {
+			// When channel is already closed in the uri processor
+			if r := recover(); r != nil {
+				log.Println("[DEBUG] Sending the file ended:", r)
+			}
+		}()
+		close(chan_stream)
+	}()
+	go file.Stream(chan_stream)
+	c.Stream(func(w io.Writer) bool {
+		if data, ok := <-chan_stream; ok {
+			w.Write(data)
+			return true
+		}
+		return false
+	})
 }

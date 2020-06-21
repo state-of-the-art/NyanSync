@@ -12,3 +12,9 @@ type FileSystemItem struct {
 	Name string
 	Type FileSystemType
 }
+
+type FileData struct {
+	Name   string
+	Size   int64
+	Stream func(chan []byte)
+}

@@ -148,6 +148,10 @@ func InitV1(router *gin.Engine) {
 		{
 			navigate.GET("/*path", NavigateGetList)
 		}
+		download := v1.Group("/download")
+		{
+			download.GET("/*path", DownloadGet)
+		}
 	}
 
 	log.Println("[DEBUG] Prepare permissions list")

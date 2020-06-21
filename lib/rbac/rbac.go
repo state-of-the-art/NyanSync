@@ -40,6 +40,7 @@ func Init() {
 		RBAC.RegisterRole(guest_role_id, "Guest default role")
 		// TODO: use api permission, not a static string not connected to api
 		RBAC.Permit(guest_role_id, RBAC.GetPermission("/api/v1/navigate"), Read)
+		RBAC.Permit(guest_role_id, RBAC.GetPermission("/api/v1/download"), Read)
 	}
 
 	// Don't need to save, because this roles are in-memory
@@ -62,11 +63,13 @@ func Save() {
 	if err := os.MkdirAll(filepath.Dir(path), 0750); err != nil {
 		log.Panic("Unable to create save dir: ", err)
 	}
-	if file, err := os.OpenFile(path, os.O_WRONLY, 640); err == nil {
+	if file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 640); err == nil {
 		defer file.Close()
 		if err = RBAC.SaveJSON(file); err != nil {
-			log.Panic("Unable to load save file: ", err)
+			log.Panic("Unable to save rbac file: ", err)
 		}
+	} else {
+		log.Panic("Unable to save rbac file: ", err)
 	}
 }
 
