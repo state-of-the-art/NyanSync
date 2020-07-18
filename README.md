@@ -23,11 +23,31 @@ TODO
 * Remove admin password file on first login
 * First user login - ask to change password
 
-## Build
+## Build NyanShare
 
 Install `imagemagick` (convert used to generate png files)
 
 Run `./build.sh` from repo or from clean workspace
+
+### Steps
+
+1. Run the go container
+   ```
+   host$ docker run --rm -it -v ${PWD}:/go/src/github.com/state-of-the-art/NyanSync:ro golang:1.14
+   ```
+2. Create tmp directory and run build inside:
+   ```
+   docker# mkdir tmp; cd tmp
+   docker# /go/src/github.com/state-of-the-art/NyanSync/build.sh
+   ```
+3. Run the NyanShare (possible with providing where the gui is placed for development):
+   ```
+   docker# NyanShare &
+   ```
+4. Check the generated admin password to login:
+   ```
+   docker# cat /root/.config/NyanShare/admin_init_pass.txt
+   ```
 
 ## Deploy NyanSync to GCP
 
@@ -108,8 +128,6 @@ so hard to do, following the next steps:
 8. Create HTTPS load balancer
 
 user-data:
-
-TODO
 
 ## OpenSource
 

@@ -7,16 +7,17 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/crgimenes/goconfig" // config framework
-	_ "github.com/crgimenes/goconfig/yaml"
+	"github.com/kkyr/fig" // config framework
 	"gopkg.in/yaml.v2"
 
 	"github.com/state-of-the-art/NyanSync/lib/location"
 )
 
+var ConfigName = "nyanshare.yaml"
+
 func (cfg *Config) SaveNow() {
 	log.Println("[INFO] Saving yaml config", cfg.FilePathGet())
-	if err := os.MkdirAll(goconfig.Path, 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(cfg.FilePathGet()), 0755); err != nil {
 		log.Panic("Error create config dir", err)
 	}
 
@@ -48,13 +49,15 @@ func (cfg *Config) Save() {
 func Load() {
 	cfg = &Config{}
 
-	goconfig.Path = location.DefaultConfigDir()
-	goconfig.File = "nyanshare.yaml"
-
-	cfg.FilePathSet(filepath.Join(goconfig.Path, goconfig.File))
-	if err := goconfig.Parse(cfg); err != nil {
+	if err := fig.Load(cfg,
+		fig.UseEnv("app"),
+		fig.File(ConfigName),
+		fig.Dirs(location.DefaultConfigDir()),
+	); err != nil {
 		log.Panic("Unable to read config file", err)
 	}
+	cfg.FilePathSet(filepath.Join(location.DefaultConfigDir(), ConfigName))
+
 	if cfg.Sources == nil {
 		cfg.Sources = make(map[string]Source)
 	}
