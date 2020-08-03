@@ -1,5 +1,7 @@
 # NyanSync
 
+[![Join the chat at https://gitter.im/state-of-the-art/NyanSync](https://badges.gitter.im/state-of-the-art/NyanSync.svg)](https://gitter.im/state-of-the-art/NyanSync?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Sharing platform to face your files in the web.
 
 Originally based on [Syncthing](https://syncthing.net/) but could be used to share any source
